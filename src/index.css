@@ -1,0 +1,116 @@
+:root {
+    --text: #6b6375;
+    --text-h: #08060d;
+    --bg: #ffffff;
+    --border: #e5e4e7;
+    --code-bg: #f4f3ec;
+
+    --accent: #aa3bff;
+    --accent-bg: rgba(170, 59, 255, 0.1);
+    --accent-border: rgba(170, 59, 255, 0.5);
+
+    --shadow: rgba(0, 0, 0, 0.08) 0 10px 30px;
+
+    --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+    --mono: ui-monospace, Consolas, monospace;
+
+    font: 18px/145% var(--sans);
+    letter-spacing: 0.18px;
+
+    color: var(--text);
+    background: var(--bg);
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@media (max-width: 1024px) {
+    :root {
+        font-size: 16px;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --text: #9ca3af;
+        --text-h: #f3f4f6;
+        --bg: #16171d;
+        --border: #2e303a;
+        --code-bg: #1f2028;
+        --accent: #c084fc;
+        --accent-bg: rgba(192, 132, 252, 0.15);
+        --accent-border: rgba(192, 132, 252, 0.5);
+        --shadow: rgba(0, 0, 0, 0.4) 0 10px 25px;
+    }
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+}
+
+#root {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2 {
+    font-weight: 600;
+    color: var(--text-h);
+    font-family: var(--sans);
+}
+
+h1 {
+    font-size: 48px;
+    margin: 32px 0;
+}
+
+@media (max-width: 1024px) {
+    h1 {
+        font-size: 32px;
+    }
+}
+
+h2 {
+    font-size: 22px;
+    margin-bottom: 8px;
+}
+
+p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+code {
+    font-family: var(--mono);
+    background: var(--code-bg);
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: var(--text-h);
+}
+
+.navbar {
+    box-shadow: var(--shadow);
+}
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+.card {
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.2);
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: cover;
+}
