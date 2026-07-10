@@ -2,12 +2,21 @@ import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import PageHeader from "./PageHeader";
+import useAuth from "../hooks/useAuth.js";
+import useFilmContext from "../hooks/useFilmContext.js";
+import useWarningContext from "../hooks/useWarningContext.js";
 
 
 
-function Home({userData,showWarning,onLikeToggle,onWatchedToggle,onLogout,fadeWarning}) {
+function Home() {
 
     const navigate = useNavigate();
+
+    const {likeToggle, watchedToggle} = useFilmContext();
+
+    const {showWarning,fadeWarning} = useWarningContext();
+
+    const {userData, logout}=useAuth();
 
     const {t} = useTranslation();
 
@@ -59,9 +68,9 @@ function Home({userData,showWarning,onLikeToggle,onWatchedToggle,onLogout,fadeWa
                                     <p className="h6 mb-4">Log in to add your personal preferences</p>
 
                                     <div className="d-flex justify-content-center gap-3">
-                                        <button className="btn btn-success btn-lg" type="button" onClick={onLogout}>{t("log_in")}</button>
+                                        <button className="btn btn-success btn-lg" type="button" onClick={logout}>{t("log_in")}</button>
 
-                                        <button className="btn btn-primary btn-lg" type="button" onClick={() =>{onLogout;navigate("/register")}}>{t("sign_in")}</button>
+                                        <button className="btn btn-primary btn-lg" type="button" onClick={() =>{logout;navigate("/register")}}>{t("sign_in")}</button>
                                     </div>
 
                                 </div>
@@ -88,13 +97,13 @@ function Home({userData,showWarning,onLikeToggle,onWatchedToggle,onLogout,fadeWa
                                 <div className="card-footer bg-dark border-0 mt-auto d-flex justify-content-end gap-3">
                                     {!userData.id ? (
                                         <>
-                                            <img onClick={() => onLikeToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
-                                            <img onClick={() => onWatchedToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
+                                            <img onClick={() => likeToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
+                                            <img onClick={() => watchedToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
                                         </>
                                     ):(
                                         <>
-                                            <img onClick={() => onLikeToggle(film.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={film.film_id === null ? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
-                                            <img onClick={() => onWatchedToggle(film.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={film.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
+                                            <img onClick={() => likeToggle(film.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={film.film_id === null ? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
+                                            <img onClick={() => watchedToggle(film.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={film.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
                                         </>
                                     )
 

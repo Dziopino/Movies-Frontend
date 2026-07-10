@@ -1,11 +1,20 @@
-import {useState, useEffect, useCallback} from "react";
-import { useTranslation } from "react-i18next";
+import {useCallback, useEffect, useState} from "react";
+import {useTranslation} from "react-i18next";
 import {useNavigate} from "react-router-dom";
 import PageHeader from "./PageHeader.jsx";
+import useAuth from "../hooks/useAuth.js";
+import useFilmContext from "../hooks/useFilmContext.js";
+import useWarningContext from "../hooks/useWarningContext.js";
 
-function Favorites({userData,onShowPopUpWarning,onLikeToggle,onWatchedToggle})  {
+function Favorites()  {
 
     const navigate = useNavigate();
+
+    const {userData} = useAuth();
+
+    const {likeToggle, watchedToggle} = useFilmContext();
+
+    const {showWarningPopup} = useWarningContext();
 
     const { t } = useTranslation();
 
@@ -34,12 +43,10 @@ function Favorites({userData,onShowPopUpWarning,onLikeToggle,onWatchedToggle})  
     })
 
     useEffect(() => {
-        const blocked = onShowPopUpWarning();
-
-        if (!blocked) {
+        if (!showWarningPopup) {
             reloadFilms();
         }
-    }, [userData.id]);
+    }, [reloadFilms, showWarningPopup, userData.id]);
 
     return (
         <>
@@ -60,13 +67,13 @@ function Favorites({userData,onShowPopUpWarning,onLikeToggle,onWatchedToggle})  
                                 <div className="card-footer bg-dark border-0 mt-auto d-flex justify-content-end gap-3">
                                     {!userData.id ? (
                                         <>
-                                            <img onClick={() => onLikeToggle(favorite.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
-                                            <img onClick={() => onWatchedToggle(favorite.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
+                                            <img onClick={() => likeToggle(favorite.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
+                                            <img onClick={() => watchedToggle(favorite.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
                                         </>
                                     ):(
                                         <>
-                                            <img onClick={() => onLikeToggle(favorite.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={favorite.film_id === null? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
-                                            <img onClick={() => onWatchedToggle(favorite.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={favorite.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
+                                            <img onClick={() => likeToggle(favorite.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={favorite.film_id === null? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
+                                            <img onClick={() => watchedToggle(favorite.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={favorite.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
                                         </>
                                     )
 

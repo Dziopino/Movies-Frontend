@@ -1,9 +1,12 @@
 import {NavLink} from "react-router-dom";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
+import useAuth from "../hooks/useAuth.js";
 
-function Login({setUserData}) {
+function Login() {
     const navigate = useNavigate();
+
+    const {setUserData} = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

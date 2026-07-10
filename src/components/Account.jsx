@@ -1,8 +1,13 @@
-import {useEffect, useState, useRef, useCallback} from "react";
-import { useTranslation } from "react-i18next";
+import {useCallback, useEffect, useRef, useState} from "react";
+import {useTranslation} from "react-i18next";
 import i18n from "i18next";
+import useAuth from "../hooks/useAuth.js";
+import useWarningContext from "../hooks/useWarningContext.js";
 
-function Account({userData,onShowPopUpWarning,setUserData}) {
+function Account() {
+
+    const {userData,setUserData} = useAuth();
+    const {showWarningPopup} = useWarningContext();
 
     const [languageCodes, setLanguageCodes] = useState([]);
     const [isBioEditionActive, setIsBioEditionActive] = useState(false);
@@ -137,13 +142,11 @@ function Account({userData,onShowPopUpWarning,setUserData}) {
 
     useEffect(() => {
         if (userData.id === null) return;
-
-        const blocked = onShowPopUpWarning();
-        if (blocked) return;
+        if (showWarningPopup) return;
 
         getUserData();
         getLanguageCodes();
-    }, [userData.id]);
+    }, [getUserData, showWarningPopup, userData.id]);
 
 
     return (

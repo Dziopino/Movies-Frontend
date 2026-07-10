@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import Stars from "./Stars.jsx";
+import useAuth from "../hooks/useAuth.js";
+import useFilmContext from "../hooks/useFilmContext.js";
 
-function Film({ userData, onWatchedToggle, onLikeToggle}) {
+function Film() {
     const { id } = useParams();
     const [film, setFilm] = useState(null);
-
+    const {userData} = useAuth();
+    const {likeToggle, watchedToggle} = useFilmContext();
     const { t } = useTranslation();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -77,13 +80,13 @@ function Film({ userData, onWatchedToggle, onLikeToggle}) {
                                     <div className="bg-dark border-0 mt-auto d-flex justify-content-end gap-3">
                                         {!userData.id ? (
                                             <>
-                                                <img onClick={() => onLikeToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
-                                                <img onClick={() => onWatchedToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
+                                                <img onClick={() => likeToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/favourite.svg" alt="favourite icon"/>
+                                                <img onClick={() => watchedToggle(film.id)} style={{height:"2rem", cursor:"pointer"}} src="/unseen.svg" alt="watched icon"/>
                                             </>
                                         ):(
                                             <>
-                                                <img onClick={() => onLikeToggle(film.id,reloadFilm)} style={{height:"2rem", cursor:"pointer"}} src={film.favoriteFilmId === null ? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
-                                                <img onClick={() => onWatchedToggle(film.id,reloadFilm)} style={{height:"2rem", cursor:"pointer"}} src={film.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
+                                                <img onClick={() => likeToggle(film.id,reloadFilm)} style={{height:"2rem", cursor:"pointer"}} src={film.favoriteFilmId === null ? "/favourite.svg" : "/favouriteRed.svg"} alt="favourite icon"/>
+                                                <img onClick={() => watchedToggle(film.id,reloadFilm)} style={{height:"2rem", cursor:"pointer"}} src={film.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
                                             </>
                                         )
 

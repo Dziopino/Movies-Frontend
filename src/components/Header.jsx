@@ -1,10 +1,12 @@
-import { NavLink } from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import BackButton from "./BackButton.jsx";
+import useAuth from "../hooks/useAuth.js";
 
-function Header({ setUserData, userData }) {
+function Header() {
     const { t } = useTranslation();
-
+    const {userData, logout}=useAuth();
+    const navigate = useNavigate();
     return (
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-4">
@@ -60,19 +62,9 @@ function Header({ setUserData, userData }) {
 
                             className="btn btn-outline-light ms-5"
                             type="button"
-                            onClick={() => {
-                                setUserData({
-                                    id: null,
-                                    email: "",
-                                    username: "guest",
-                                    avatar_url: null,
-                                    created_at: null,
-                                    role: 0,
-                                    bio: null,
-                                    language_code: "en"
-                                });
-
-                                localStorage.clear();
+                            onClick={()=> {
+                                logout();
+                                navigate("/login");
                             }}
                         >
                             {userData.id ? t("logout") : t("log_in")}

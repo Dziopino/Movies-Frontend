@@ -3,10 +3,11 @@ import Footer from "./Footer";
 import BackButton from "./BackButton";
 import { Outlet } from "react-router-dom";
 
-function AppLayout({ setUserData, userData })  {
+function AppLayout()  {
+
     return (
         <>
-            <Header setUserData={setUserData} userData={userData} />
+            <Header />
 
             <BackButton />
 
