@@ -114,3 +114,66 @@ code {
     height: 200px;
     object-fit: cover;
 }
+
+.fade-warning {
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.fade-warning.fade-out {
+    opacity: 0;
+}
+
+.profilePictureOption {
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.profilePictureOption:hover {
+    transform: translateX(3px);
+}
+
+.back-button {
+    position: fixed;
+
+    top: 24px;
+    left: clamp(10px, 2vw, 20px);
+
+    width: clamp(38px, 5vw, 52px);
+    height: clamp(38px, 5vw, 52px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: rgba(33, 37, 41, 0.9);
+    backdrop-filter: blur(6px);
+    color: white;
+
+    cursor: pointer;
+    z-index: 1000;
+
+    transition: all .2s ease;
+}
+
+.back-button:hover {
+    transform: translateX(-3px);
+    background: rgb(52, 58, 64);
+}
+
+.back-button:active {
+    transform: scale(0.95);
+}
+
+@media (max-width: 768px) {
+    .back-button {
+        top: 24px;
+        left: 12px;
+
+        width: 42px;
+        height: 42px;
+    }
+}

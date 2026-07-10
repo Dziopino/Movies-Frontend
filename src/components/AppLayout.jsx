@@ -1,13 +1,16 @@
-import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import BackButton from "./BackButton";
+import { Outlet } from "react-router-dom";
 
-function AppLayout({setUserData}) {
+function AppLayout({ setUserData, userData })  {
     return (
         <>
-            <Header setUserData={setUserData} />
+            <Header setUserData={setUserData} userData={userData} />
 
-            <div className="min-vh-100">
+            <BackButton />
+
+            <div style={{ display: "flex", flexGrow: 1 }}>
                 <Outlet />
             </div>
 

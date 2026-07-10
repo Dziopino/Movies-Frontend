@@ -33,7 +33,7 @@ function Login({setUserData}) {
 
     return (
         <>
-        <section className="vh-100 gradient-custom">
+            <section className="gradient-custom">
             <div className="container py-5 h-100">
                 <div className="row d-flex justify-content-center align-items-center h-100">
                     <div className="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -55,7 +55,7 @@ function Login({setUserData}) {
                                         <label className="form-label" htmlFor="typePasswordX">Password</label>
                                     </div>
 
-                                    <p className="small mb-5 pb-lg-2"><NavLink className="text-white-50" to="/passReset">Forgot password?</NavLink></p>
+                                    <p className="small mb-5 pb-lg-2"><NavLink className="text-white-50" to="/forgotPassword">Forgot password?</NavLink></p>
 
 
                                     <div data-mdb-input-init className="form-outline form-white mb-4">
@@ -65,7 +65,9 @@ function Login({setUserData}) {
 
 
                                     <button data-mdb-button-init data-mdb-ripple-init className="btn btn-outline-light btn-lg px-5 mt-4" type="button" onClick={()=> {
-                                        setUserData({id: 0});
+                                        setUserData({id: 0, email: "", username: "guest", avatar_url: null, created_at: null, role: 0, bio: "", language_code: "en"});
+                                        localStorage.setItem("userId", 0);
+                                        localStorage.setItem("language_code", "en")
                                         navigate("/");
                                     }}>Continue as guest</button>
 
