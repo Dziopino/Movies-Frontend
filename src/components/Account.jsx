@@ -1,5 +1,5 @@
-import {useCallback, useEffect, useRef, useState} from "react";
-import {useTranslation} from "react-i18next";
+import {useEffect, useState, useRef, useCallback} from "react";
+import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import useAuth from "../hooks/useAuth.js";
 import useWarningContext from "../hooks/useWarningContext.js";
@@ -7,6 +7,7 @@ import useWarningContext from "../hooks/useWarningContext.js";
 function Account() {
 
     const {userData,setUserData} = useAuth();
+
     const {showWarningPopup} = useWarningContext();
 
     const [languageCodes, setLanguageCodes] = useState([]);
@@ -142,11 +143,13 @@ function Account() {
 
     useEffect(() => {
         if (userData.id === null) return;
-        if (showWarningPopup) return;
+
+        const blocked = showWarningPopup();
+        if (blocked) return;
 
         getUserData();
         getLanguageCodes();
-    }, [getUserData, showWarningPopup, userData.id]);
+    }, [userData.id]);
 
 
     return (

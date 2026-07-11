@@ -18,8 +18,9 @@ function BackButton() {
     if (blocked.includes(location.pathname)) return null;
 
     return (
-        <button className="back-button" onClick={handleBack}>
+        <button className="back-button" aria-label="Back" onClick={handleBack}>
             <FaArrowLeft size="60%" />
+
         </button>
     );
 }

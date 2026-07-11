@@ -11,9 +11,9 @@ function AppLayout()  {
 
             <BackButton />
 
-            <div style={{ display: "flex", flexGrow: 1 }}>
+            <main style={{ display: "flex", flexGrow: 1 }}>
                 <Outlet />
-            </div>
+            </main>
 
             <Footer />
         </>

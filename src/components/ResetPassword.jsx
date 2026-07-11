@@ -1,33 +1,50 @@
-import {NavLink, useParams} from "react-router-dom";
+import {NavLink, useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
+import PasswordValidator from "./PasswordValidator.jsx";
+import { isPasswordValid } from "../utils/passwordValidator.js";
+import config from "../config/api.js";
 
 function ResetPassword() {
+    const navigate = useNavigate();
     const {token}= useParams();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");
     const [valid, setValid] = useState();
+    const [finalMessage, setFinalMessage] = useState("");
+    const [isChanged, setIsChanged] = useState(false);
+
 
     useEffect(() => {
         fetch(`http://localhost:8000/getResetToken/${token}`)
             .then(res => res.json()).then((data) => {
                 setValid(data.valid);
         })
-    },[])
+    },[token])
 
     const onSubmit = (e) => {
         e.preventDefault();
 
         if (password !== confirmPassword) {
-           return setMessage("Passwords don't match");
+            return setMessage("Passwords don't match");
         }
 
-        if (password.length < 6) {
-            return setMessage("Password must be at least 6 characters");
+        if (!isPasswordValid(password)) {
+            return setMessage("Password does not meet requirements");
         }
 
+        setMessage("");
 
-    }
+        fetch(`${config.apiUrl}/resetPassword/${token}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({password: password}),
+        }).then(res => res.json()).then((data) => {
+            setIsChanged(data.isChanged);
+            setFinalMessage(data.message);
+        })
+
+    };
 
 
     return (
@@ -48,18 +65,32 @@ function ResetPassword() {
                                                 <p className="text-white-50 mb-5">Please enter your new password</p>
 
                                                 <div data-mdb-input-init className="form-outline form-white mb-4">
-                                                    <input type="password" value={password} id="typeEmailX" className="form-control form-control-lg" onChange={(e) => setPassword(e.target.value)}/>
-                                                    <label className="form-label" htmlFor="typeEmailX">Password</label>
+                                                    <input type="password" value={password} id="password" className="form-control form-control-lg" onChange={(e) => setPassword(e.target.value)}/>
+                                                    <label className="form-label" htmlFor="password">Password</label>
+                                                    <PasswordValidator password={password}/>
                                                 </div>
 
                                                 <div data-mdb-input-init className="form-outline form-white mb-4">
-                                                    <input type="password" value={confirmPassword} id="typeEmailX" className="form-control form-control-lg" onChange={(e) => setConfirmPassword(e.target.value)}/>
-                                                    <label className="form-label" htmlFor="typeEmailX">Confirm password</label>
+                                                    <input type="password" value={confirmPassword} id="confirmPasssword" className="form-control form-control-lg" onChange={(e) => setConfirmPassword(e.target.value)}/>
+                                                    <label className="form-label" htmlFor="confirmPasssword">Confirm password</label>
                                                 </div>
 
                                                 <p className="text-danger mb-4">{message}</p>
+                                                {!isChanged ? (
+                                                    <button className="btn btn-outline-light btn-lg px-5" type="submit" disabled={!isPasswordValid(password)}>
+                                                        Reset password
+                                                    </button>
+                                                ):(
+                                                    <button className="btn btn-outline-light btn-lg px-5" type="button" onClick={()=>{navigate("/login")}} >
+                                                        Go back to login page
+                                                    </button>)}
 
-                                                <button data-mdb-button-init data-mdb-ripple-init className="btn btn-outline-light btn-lg px-5" type="submit">Reset password</button>
+                                                {isChanged ?
+                                                    <p className="text-success mt-4">{finalMessage}</p>
+                                                    :
+                                                    <p className="text-danger mt-4">{finalMessage}</p>
+                                                }
+
 
 
 

@@ -8,17 +8,18 @@ import './index.css'
 import './i18n';
 import App from './App.jsx'
 import ScrollToTop from "./components/ScrollToTop.js";
+import {WarningProvider} from "./context/WarningContext.jsx";
 
 
 createRoot(document.getElementById('root')).render(
     <BrowserRouter>
         <AuthProvider>
-
             <FilmProvider>
-                <ScrollToTop />
-                <App />
+                <WarningProvider>
+                    <ScrollToTop />
+                    <App />
+                </WarningProvider>
             </FilmProvider>
-
         </AuthProvider>
     </BrowserRouter>,
 )

@@ -26,7 +26,7 @@ function Film() {
     }, [id, userData.id, userData.language_code]);
 
 
-    if (!film) return <div className="text-white p-5">Loading...</div>;
+    if (!film) return <div className="text-white p-5"></div>;
 
     return (
         <div className="container py-5 text-white d-flex justify-content-center">

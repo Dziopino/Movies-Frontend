@@ -14,7 +14,7 @@ function Header() {
 
                     <BackButton />
 
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false">
+                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"  aria-label="Open navbar">
                         <span className="navbar-toggler-icon"></span>
                     </button>
 

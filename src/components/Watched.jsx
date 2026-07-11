@@ -45,10 +45,14 @@ function Watched() {
     })
 
     useEffect(() => {
-        if (!showWarningPopup) {
+
+        const blocked = showWarningPopup();
+
+        if (!blocked) {
             reloadFilms();
         }
-    }, [showWarningPopup, reloadFilms, userData.id]);
+
+    }, [userData.id]);
 
     return (
         <>

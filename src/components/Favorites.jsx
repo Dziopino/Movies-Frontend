@@ -43,10 +43,14 @@ function Favorites()  {
     })
 
     useEffect(() => {
-        if (!showWarningPopup) {
+
+        const blocked = showWarningPopup();
+
+        if (!blocked) {
             reloadFilms();
         }
-    }, [reloadFilms, showWarningPopup, userData.id]);
+
+    }, [userData.id]);
 
     return (
         <>

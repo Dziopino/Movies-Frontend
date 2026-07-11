@@ -1,9 +1,8 @@
-import useFilmContext from "./useFilmContext.js";
+import {useContext} from "react";
 import {WarningContext} from "../context/WarningContext.jsx";
 
-
-function UseWarningContext() {
-    return useFilmContext(WarningContext);
+function useWarningContext() {
+    return useContext(WarningContext);
 }
 
-export default UseWarningContext;
+export default useWarningContext;
