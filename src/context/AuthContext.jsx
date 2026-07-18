@@ -12,7 +12,7 @@ export function AuthProvider({children}) {
         username: "guest",
         avatar_url: null,
         created_at: null,
-        role: 0,
+        role: Number(localStorage.getItem("role")) || 0,
         bio: null,
         language_code: localStorage.getItem("language_code") || "en"
     });
@@ -30,6 +30,7 @@ export function AuthProvider({children}) {
         localStorage.removeItem("token");
         localStorage.removeItem("userId");
         localStorage.removeItem("language_code");
+        localStorage.removeItem("role");
 
         setUserData({
             id: null,

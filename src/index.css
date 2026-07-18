@@ -177,3 +177,162 @@ code {
         height: 42px;
     }
 }
+
+.admin-users h2 {
+    color: var(--text-h);
+}
+
+
+.admin-table {
+    background: #343a40;
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: var(--shadow);
+}
+
+
+.admin-table table {
+    table-layout: fixed;
+    width: 100%;
+}
+
+
+.admin-table tbody tr {
+    transition: .2s;
+}
+
+
+.admin-table tbody tr:hover {
+    transform: scale(1.01);
+}
+
+.admin-table td,
+.admin-table th {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.user-avatar {
+
+    width: 45px;
+    height: 45px;
+
+    object-fit: cover;
+
+    border-radius: 50%;
+}
+
+
+.placeholder-avatar {
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    background-color: rgba(59, 130, 246, 0.15);
+
+    color:white;
+
+    font-weight:600;
+}
+
+
+.badge-admin {
+
+    color: #60a5fa;
+    background-color: rgba(59, 130, 246, 0.15);
+
+}
+
+
+.badge-user {
+
+    background: rgba(99,173,111,.15);
+    color:#63ad6f;
+
+}
+
+.badge-active {
+
+    background: rgba(99,173,111,.15);
+    color:#63ad6f;
+
+}
+
+.badge-banned {
+    background: rgba(220, 53, 69, 0.15);
+    color: #dc3545;
+}
+
+
+
+.mobile-users {
+    display:none;
+}
+
+
+
+.user-card {
+
+    background:var(--bg);
+
+    padding:20px;
+
+    border-radius:16px;
+
+    box-shadow:var(--shadow);
+
+    margin-bottom:15px;
+
+}
+
+
+@media(max-width:768px){
+
+
+    .admin-table {
+        display:none;
+    }
+
+
+    .mobile-users {
+        display:block;
+    }
+
+
+}
+.admin-protected {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+
+    border-radius: 6px;
+
+    color: #60a5fa;
+    background-color: rgba(59, 130, 246, 0.15);
+
+    cursor: not-allowed;
+    font-size: 14px;
+}
+
+.users-count {
+    color: var(--text);
+    opacity: .8;
+    font-size: .8em;
+    font-weight: 400;
+}
+
+.user-card .btn-outline-danger {
+    color: #e4606d;
+    border-color: #e4606d;
+}
+
+.user-card .btn-outline-danger:hover {
+    background-color: #e4606d;
+    color: #16171d;
+}

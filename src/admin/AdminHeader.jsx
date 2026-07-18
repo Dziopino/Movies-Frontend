@@ -1,9 +1,9 @@
+import BackButton from "../components/BackButton.jsx";
 import {NavLink, useNavigate} from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import BackButton from "./BackButton.jsx";
+import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
 
-function Header() {
+function AdminHeader() {
     const { t } = useTranslation();
     const {userData, logout}=useAuth();
     const navigate = useNavigate();
@@ -28,26 +28,26 @@ function Header() {
                     <ul className="navbar-nav ms-5">
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/">
-                                {t("home")}
+                            <NavLink className="nav-link" to="/admin_dashboard">
+                                {t("dashboard")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/favorites">
-                                {t("favorites")}
+                            <NavLink className="nav-link" to="/admin_films">
+                                {t("movies")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/watched">
-                                {t("watched")}
+                            <NavLink className="nav-link" to="/admin_users">
+                                {t("users")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/account">
-                                {t("account")}
+                            <NavLink className="nav-link" to="/admin_genres">
+                                {t("genres")}
                             </NavLink>
                         </li>
 
@@ -57,9 +57,7 @@ function Header() {
                     <div className="ms-auto d-flex align-items-center gap-3 ">
 
                         <BackButton />
-                        {userData.role === 1 && (
-                            <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/admin_dashboard");}}>{t("admin_panel")}</button>
-                        )}
+                            <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/");}}>{t("home")}</button>
 
 
 
@@ -72,7 +70,6 @@ function Header() {
                 </div>
             </nav>
         </header>
-    );
+    )
 }
-
-export default Header;
+export default AdminHeader;

@@ -29,7 +29,22 @@ const resources = {
             release_date: "Release date",
             movies: "Movies",
             search: "Search...",
-            bio:"Bio"
+            bio:"Bio",
+            admin_panel: "Admin Panel",
+            users: "Users",
+            dashboard: "Dashboard",
+            manage_application_users:"Manage application users",
+            add_admin: "Add Admin",
+            user:"User",
+            language:"Language",
+            role:"Role",
+            status:"Status",
+            created_at:"Created at",
+            action:"Action",
+            profile_picture:"Profile picture",
+            suspend_user:"Suspend user",
+            ban_user: "Ban user",
+
         }
     },
     pl: {
@@ -59,7 +74,22 @@ const resources = {
             release_date: "Data wydania",
             movies: "Filmy",
             search: "Szukaj...",
-            bio:"Opis"
+            bio:"Opis",
+            admin_panel: "Panel administratora",
+            users: "Użytkownicy",
+            dashboard: "Pulpit",
+            manage_application_users:"Zarządzaj użytkownikami",
+            add_admin:"Dodaj Administratora",
+            user:"Użytkownik",
+            language:"Język",
+            role:"Rola",
+            status:"Status",
+            created_at:"Utworzono",
+            action:"Akcja",
+            profile_picture:"Zdjęcie profilowe",
+            suspend_user:"Zawieś użytkownika",
+            ban_user:"Zbanuj użytkownika",
+
         }
     }
 };

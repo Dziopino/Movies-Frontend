@@ -10,6 +10,12 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import AppLayout from "./components/AppLayout";
 import Film from "./components/Film.jsx";
 import ResetPassword from "./components/ResetPassword.jsx";
+import AdminRoute from "./admin/AdminRoute.jsx";
+import AdminLayout from "./admin/AdminLayout.jsx";
+import AdminDashboard from "./admin/AdminDashboard.jsx";
+import AdminFilms from "./admin/AdminFilms.jsx";
+import AdminUsers from "./admin/AdminUsers.jsx";
+import AdminGenres from "./admin/AdminGenres.jsx";
 
 
 function App() {
@@ -18,28 +24,43 @@ function App() {
         <Routes>
 
             {/* PUBLIC */}
-            <Route path="/login" element={<Login/>} />
-            <Route path="/register" element={<Register/>} />
-            <Route path="/forgotPassword" element={<ForgotPassword />} />
-            <Route path="/resetPassword/:token" element={<ResetPassword />} />
+            <Route path="/login" element={<Login/>}/>
+            <Route path="/register" element={<Register/>}/>
+            <Route path="/forgotPassword" element={<ForgotPassword/>}/>
+            <Route path="/resetPassword/:token" element={<ResetPassword/>}/>
 
-            {/* PROTECTED */}
+
+            {/* USER */}
             <Route element={<ProtectedRoutes/>}>
 
                 <Route element={<AppLayout/>}>
 
                     <Route path="/" element={<Home/>}/>
-
                     <Route path="/favorites" element={<Favorites/>}/>
-
                     <Route path="/watched" element={<Watched/>}/>
-
                     <Route path="/account" element={<Account/>}/>
-
                     <Route path="/film/:id" element={<Film/>}/>
 
+
                 </Route>
+
+
+                {/* ADMIN */}
+                <Route element={<AdminRoute/>}>
+
+                    <Route element={<AdminLayout/>}>
+
+                        <Route path="/admin_dashboard" element={<AdminDashboard />}/>
+                        <Route path="/admin_films" element={<AdminFilms />}/>
+                        <Route path="/admin_users" element={<AdminUsers />}/>
+                        <Route path="/admin_genres" element={<AdminGenres />}/>
+
+                    </Route>
+
+                </Route>
+
             </Route>
+
         </Routes>
     );
 }
