@@ -25,12 +25,27 @@ function Account() {
     const getUserData = useCallback(() => {
         fetch("http://localhost:8000/getUserData",{
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({userId: userData.id}),
-        }).then(res => res.json()).then(data => {
-            setUserData({id:localStorage.getItem("userId"), email: data.body.email, username: data.body.username, avatar_url: data.body.avatar_url, created_at: data.body.created_at, role: data.body.role, bio: data.body.bio, language_code: data.body.language_code});
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
         })
-    },[userData.id, setUserData])
+            .then(res => res.json())
+            .then(data => {
+
+                setUserData({
+                    id: userData.id,
+                    email: data.body.email,
+                    username: data.body.username,
+                    avatar_url: data.body.avatar_url,
+                    created_at: data.body.created_at,
+                    role: data.body.role,
+                    bio: data.body.bio,
+                    language_code: data.body.language_code
+                });
+
+            })
+    },[setUserData, userData.id])
 
     const getLanguageCodes = () => {
         fetch("http://localhost:8000/getLanguageCodes")
@@ -44,8 +59,11 @@ function Account() {
 
         fetch("http://localhost:8000/editUserBio", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({userId: userData.id,userBio: bioEditionInput}),
+            headers: {
+                "Content-Type": "application/json" ,
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({userBio: bioEditionInput}),
         }).then(res => res.json()).then(() => {
             setIsBioEditionActive(false);
             getUserData();
@@ -57,8 +75,11 @@ function Account() {
         e.preventDefault();
         fetch("http://localhost:8000/editUserName", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({userId: userData.id,userName: userNameInput}),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({userName: userNameInput}),
         }).then(res => res.json()).then(() => {
             setIsUserNameEditionActive(false);
             getUserData();
@@ -70,11 +91,11 @@ function Account() {
 
         fetch("http://localhost:8000/changeUserLanguage", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                userId: userData.id,
-                userLanguageCode: selectedLanguageCode
-            }),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({userLanguageCode: selectedLanguageCode}),
         }).then(res => res.json()).then(() => {
 
             i18n.changeLanguage(selectedLanguageCode);
@@ -123,10 +144,12 @@ function Account() {
 
         const formData = new FormData();
         formData.append("avatar", file);
-        formData.append("userId", userData.id);
 
         fetch("http://localhost:8000/uploadAvatar", {
             method: "POST",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
             body: formData,
         })
             .then(res => res.json())
@@ -149,7 +172,8 @@ function Account() {
 
         getUserData();
         getLanguageCodes();
-    }, [userData.id]);
+    }, [getUserData, showWarningPopup, userData.id]);
+
 
 
     return (
@@ -193,7 +217,10 @@ function Account() {
                                 <div className="d-flex justify-content-between align-items-center">
                                     <h2 className="m-0">{t("username")}: {userData.username}</h2>
                                     <img src="/edit.svg" alt="edit" style={{width: "24px", cursor: "pointer"}}
-                                         onClick={() => setIsUserNameEditionActive(true)}/>
+                                         onClick={() => {
+                                             setUserNameInput(userData.username ?? "");
+                                             setIsUserNameEditionActive(true);
+                                         }}/>
                                 </div>
                             )}
                         </div>
@@ -214,7 +241,10 @@ function Account() {
                                 <div className="d-flex justify-content-between">
                                     <p className="text-white">{t("bio")}: {userData.bio}</p>
                                     <img src="/edit.svg" alt="edit" style={{width: "24px", cursor: "pointer"}}
-                                         onClick={() => setIsBioEditionActive(true)}/>
+                                         onClick={() => {
+                                             setBioEditionInput(userData.bio ?? "");
+                                             setIsBioEditionActive(true)
+                                         }}/>
                                 </div>
                             )}
                         </div>

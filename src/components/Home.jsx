@@ -31,8 +31,11 @@ function Home() {
     const reloadFilms = () => {
         fetch("http://localhost:8000/getFilms", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId: userData.id })
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: JSON.stringify({language: userData.language_code})
         })
             .then(res => res.json())
             .then(data => {
@@ -47,7 +50,7 @@ function Home() {
 
     useEffect(() => {
         reloadFilms();
-    },[userData.id]);
+    },[reloadFilms, userData.id]);
 
 
 
@@ -106,7 +109,6 @@ function Home() {
                                             <img onClick={() => watchedToggle(film.id,reloadFilms)} style={{height:"2rem", cursor:"pointer"}} src={film.watchedFilmId === null ? "/unseen.svg" : "/seen.svg"} alt="watched icon"/>
                                         </>
                                     )
-
                                     }
 
                                 </div>

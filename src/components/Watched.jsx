@@ -33,8 +33,10 @@ function Watched() {
     const reloadFilms = useCallback(() =>{
         fetch("http://localhost:8000/watchedGet",{
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({userId : userData.id}),
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
         }).then((res) => res.json()).then((data) => {
             if (data.message === "Watched got successfully") {
                 setWatched(data.body);

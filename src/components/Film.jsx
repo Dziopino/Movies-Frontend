@@ -14,7 +14,13 @@ function Film() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilm = () => {
-        fetch(`http://localhost:8000/getFilm/${id}?language=${userData.language_code}&userId=${userData.id}`)
+        fetch(`http://localhost:8000/getFilm/${id}?language=${userData.language_code}`,{
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+        })
             .then(res => res.json())
             .then(data => {
                 setFilm(data.body);

@@ -27,8 +27,23 @@ function Login() {
         .then(data => {
             alert(data.message);
             if (data.message === "Logged in successfully"){
-                setUserData({id: parseInt(data.user.id), email :data.user.email, username: data.user.username, avatar_url: data.user.avatar_url, created_at: data.user.created_at, role: data.user.role, bio: data.user.bio, language_code: data.user.language_code});
+
+                setUserData({
+                    id: parseInt(data.user.id),
+                    email:data.user.email,
+                    username:data.user.username,
+                    avatar_url:data.user.avatar_url,
+                    created_at:data.user.created_at,
+                    role:data.user.role,
+                    bio:data.user.bio,
+                    language_code:data.user.language_code
+                });
+
+
+                localStorage.setItem("token", data.token);
+
                 localStorage.setItem("userId", data.user.id);
+
                 navigate("/");
             }
         })

@@ -1,13 +1,15 @@
 import config from "../config/api.js";
 
-export function likeFilm(filmId, userId) {
+export function likeFilm(filmId) {
 
     return fetch(`${config.apiUrl}/likeToggle`, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify({
             filmId: parseInt(filmId),
-            userId: parseInt(userId)
         })
     })
         .then(res => res.json());
@@ -15,14 +17,16 @@ export function likeFilm(filmId, userId) {
 }
 
 
-export function watchFilm(filmId, userId) {
+export function watchFilm(filmId) {
 
     return fetch(`${config.apiUrl}/watchedToggle`, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
         body: JSON.stringify({
             filmId: parseInt(filmId),
-            userId: parseInt(userId)
         })
     })
         .then(res => res.json());
