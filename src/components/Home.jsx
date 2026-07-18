@@ -5,6 +5,7 @@ import PageHeader from "./PageHeader";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
+import config from "../config/api.js";
 
 
 
@@ -29,7 +30,7 @@ function Home() {
     );
 
     const reloadFilms = () => {
-        fetch("http://localhost:8000/getFilms", {
+        fetch(`${config.apiUrl}/getFilms`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

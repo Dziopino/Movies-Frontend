@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import useAuth from "../hooks/useAuth.js";
 import useWarningContext from "../hooks/useWarningContext.js";
+import config from "../config/api.js";
 
 function Account() {
 
@@ -23,7 +24,7 @@ function Account() {
 
 
     const getUserData = useCallback(() => {
-        fetch("http://localhost:8000/getUserData",{
+        fetch(`${config.apiUrl}/getUserData`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -48,7 +49,7 @@ function Account() {
     },[setUserData, userData.id])
 
     const getLanguageCodes = () => {
-        fetch("http://localhost:8000/getLanguageCodes")
+        fetch(`${config.apiUrl}/getLanguageCodes`)
             .then(res => res.json()).then(data => {
             setLanguageCodes(data.body);
         })
@@ -57,7 +58,7 @@ function Account() {
     const onEditUserBio = (e) => {
         e.preventDefault();
 
-        fetch("http://localhost:8000/editUserBio", {
+        fetch(`${config.apiUrl}/editUserBio`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json" ,
@@ -73,7 +74,7 @@ function Account() {
 
     const onEditUserName = (e) => {
         e.preventDefault();
-        fetch("http://localhost:8000/editUserName", {
+        fetch(`${config.apiUrl}/editUserName`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -89,7 +90,7 @@ function Account() {
     const onChangeLanguage = (e) => {
         const selectedLanguageCode = e.target.value;
 
-        fetch("http://localhost:8000/changeUserLanguage", {
+        fetch(`${config.apiUrl}/changeUserLanguage`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -115,12 +116,12 @@ function Account() {
     }
 
     const onViewProfilePicture = () => {
-        if (!userData.avatar_url) return;
+        if (!userData.avatar_url){
+            window.open(`/guest.webp`, "_blank");
+            return;
+        }
 
-        window.open(
-            `http://localhost:8000${userData.avatar_url}`,
-            "_blank"
-        );
+        window.open(`${config.apiUrl}${userData.avatar_url}`, "_blank");
     };
 
     const onOpenFilePicker = () => {
@@ -145,7 +146,7 @@ function Account() {
         const formData = new FormData();
         formData.append("avatar", file);
 
-        fetch("http://localhost:8000/uploadAvatar", {
+        fetch(`${config.apiUrl}/uploadAvatar`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -183,7 +184,7 @@ function Account() {
                 <div className="col-md-4 mb-4 mb-md-0 d-flex justify-content-center">
                     <div className="bg-dark rounded shadow-lg overflow-hidden w-100 text-center p-3">
 
-                        <img src={userData.avatar_url === null ? "/guest.webp" : `http://localhost:8000${userData.avatar_url}`} alt="user avatar" className="img-fluid rounded-circle" style={{ width: "180px", height: "180px", objectFit: "cover", cursor: "pointer" }} onClick={onSetEditProfilePictureToggler}/>
+                        <img src={userData.avatar_url === null ? "/guest.webp" : `${config.apiUrl}${userData.avatar_url}`} alt="user avatar" className="img-fluid rounded-circle" style={{ width: "180px", height: "180px", objectFit: "cover", cursor: "pointer" }} onClick={onSetEditProfilePictureToggler}/>
 
                         {isProfilePictureEditionActive && (
                             <div className="d-flex flex-column gap-2 mt-3">

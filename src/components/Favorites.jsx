@@ -5,6 +5,7 @@ import PageHeader from "./PageHeader.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
+import config from "../config/api.js";
 
 function Favorites()  {
 
@@ -29,7 +30,7 @@ function Favorites()  {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilms = useCallback(() =>{
-        fetch("http://localhost:8000/likedGet",{
+        fetch(`${config.apiUrl}/likedGet`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

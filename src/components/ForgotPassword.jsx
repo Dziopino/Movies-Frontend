@@ -1,5 +1,6 @@
 import {NavLink} from "react-router-dom";
 import {useState} from "react";
+import config from "../config/api.js";
 
 
 function ForgotPassword() {
@@ -9,7 +10,7 @@ function ForgotPassword() {
 
     const onSubmit = (e) =>{
         e.preventDefault();
-        fetch("http://localhost:8000/requestPasswordReset", {
+        fetch(`${config.apiUrl}/requestPasswordReset`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({

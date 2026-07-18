@@ -16,7 +16,7 @@ function ResetPassword() {
 
 
     useEffect(() => {
-        fetch(`http://localhost:8000/getResetToken/${token}`)
+        fetch(`${config.apiUrl}/getResetToken/${token}`)
             .then(res => res.json()).then((data) => {
                 setValid(data.valid);
         })

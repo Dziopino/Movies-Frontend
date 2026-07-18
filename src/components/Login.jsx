@@ -2,6 +2,7 @@ import {NavLink} from "react-router-dom";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import useAuth from "../hooks/useAuth.js";
+import config from "../config/api.js";
 
 function Login() {
     const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Login() {
             return;
         }
 
-        fetch("http://localhost:8000/checkLoginData", {
+        fetch(`${config.apiUrl}/checkLoginData`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({email, password}),

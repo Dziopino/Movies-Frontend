@@ -5,6 +5,7 @@ import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
+import config from "../config/api.js";
 
 
 function Watched() {
@@ -31,7 +32,7 @@ function Watched() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilms = useCallback(() =>{
-        fetch("http://localhost:8000/watchedGet",{
+        fetch(`${config.apiUrl}/watchedGet`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
