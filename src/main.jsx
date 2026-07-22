@@ -9,10 +9,17 @@ import './i18n';
 import App from './App.jsx'
 import ScrollToTop from "./components/ScrollToTop.js";
 import {WarningProvider} from "./context/WarningContext.jsx";
+import {Toaster} from "react-hot-toast";
 
 
 createRoot(document.getElementById('root')).render(
     <BrowserRouter>
+        <Toaster
+            position="top-right"
+            toastOptions={{
+                duration: 3000
+            }}
+        />
         <AuthProvider>
             <FilmProvider>
                 <WarningProvider>

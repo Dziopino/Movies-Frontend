@@ -51,7 +51,7 @@ function Home() {
 
     useEffect(() => {
         reloadFilms();
-    },[reloadFilms, userData.id]);
+    },[userData.id]);
 
 
 

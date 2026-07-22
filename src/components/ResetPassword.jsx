@@ -3,6 +3,7 @@ import {useEffect, useState} from "react";
 import PasswordValidator from "./PasswordValidator.jsx";
 import { isPasswordValid } from "../utils/passwordValidator.js";
 import config from "../config/api.js";
+import StatusMessage from "./StatusMessage.jsx";
 
 function ResetPassword() {
     const navigate = useNavigate();
@@ -49,15 +50,16 @@ function ResetPassword() {
 
     return (
         <>
-            <section className="vh-100 gradient-custom">
+        {valid ?
+            (<section className="vh-100 gradient-custom">
                 <div className="container py-5 h-100">
                     <div className="row d-flex justify-content-center align-items-center h-100">
                         <div className="col-12 col-md-8 col-lg-6 col-xl-5">
                             <div className="card bg-dark text-white" style={{ borderRadius: "1rem"}}>
                                 <div className="card-body p-5 text-center">
 
-                                    {valid ?
-                                        (<div>
+
+                                        <div>
                                             <form className="mb-md-5 mt-md-4 pb-5" onSubmit={onSubmit}>
 
                                                 <h2 className="fw-bold mb-2 text-uppercase">Reset your password</h2>
@@ -95,9 +97,7 @@ function ResetPassword() {
 
 
                                             </form>
-                                        </div>)
-                                        :
-                                        ((
+                                        </div>
                                             <div className="py-4">
 
                                                 <div className="mb-4">
@@ -114,13 +114,22 @@ function ResetPassword() {
 
                                                 <NavLink to="/forgotPassword" className="btn btn-outline-light btn-lg px-5">Request new link</NavLink>
                                             </div>
-                                        ))}
+
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
+            ):(
+                <StatusMessage
+                    icon="bi bi-exclamation-triangle-fill"
+                    title="Link expired"
+                    message="This password reset link has expired or is no longer valid. Please request a new password reset link."
+                    buttonText="Request new link"
+                    buttonLink="/forgotPassword"
+                />
+            )}
         </>
     )
 }

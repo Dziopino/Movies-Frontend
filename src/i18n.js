@@ -44,7 +44,13 @@ const resources = {
             profile_picture:"Profile picture",
             suspend_user:"Suspend user",
             ban_user: "Ban user",
-
+            unsuspend_user:"Unsuspend user",
+            unban_user:"Unban user",
+            unban:"Unban",
+            unsuspend:"Unsuspend",
+            suspend:"Suspend",
+            ban:"Ban",
+            protected: "Protected",
         }
     },
     pl: {
@@ -88,8 +94,14 @@ const resources = {
             action:"Akcja",
             profile_picture:"Zdjęcie profilowe",
             suspend_user:"Zawieś użytkownika",
-            ban_user:"Zbanuj użytkownika",
-
+            ban_user:"Zablokuj użytkownika",
+            unsuspend_user:"Odwieś użytkownika",
+            unban_user:"Odblokuj użytkownika",
+            unban:"Odblokuj",
+            unsuspend:"Odwieś",
+            suspend:"Zawieś",
+            ban:"Zablokuj",
+            protected:"Chroniony"
         }
     }
 };

@@ -1,45 +1,105 @@
-import {Ban, Shield, Lock, CirclePause} from "lucide-react";
+import {Ban, Lock, CirclePause, ShieldUser, CirclePlay, ShieldCheck} from "lucide-react";
 import {useEffect, useState} from "react";
-import config from "../config/api.js";
 import {useTranslation} from "react-i18next";
+import AdminBanModal from "./AdminBanModal.jsx";
+import AdminSuspendModal from "./AdminSuspendModal.jsx";
+import toast from "react-hot-toast";
+import config from "../config/api.js";
+import {getUsers, getUsersCount, refreshUser, banUser, suspendUser, unSuspendUser, unBanUser} from "../services/adminService.js";
+import Pagination from "../components/Pagination.jsx";
 
 function AdminUsers() {
 
     const {t} = useTranslation();
 
     const [users, setUsers] = useState([]);
-    const [message, setMessage] = useState("");
     const [usersCount, setUsersCount] = useState(0);
+    const [banModal, setBanModal] = useState(false);
+    const [suspendModal, setSuspendModal] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const usersPerPage = 50;
+    const [totalPages, setTotalPages] = useState(0);
 
-    useEffect(() => {
-        fetch(`${config.apiUrl}/getUsers`,{
-            method: "GET",
-            headers:{
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-            .then(res => res.json())
-            .then(data => {
-                if(!data.success){
-                    setMessage(data.message);
-                }
-                setUsers(data.users);
-            });
+    const changePage = (page) => {
+        setCurrentPage(page);
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
 
-        fetch(`${config.apiUrl}/getUsersCount`,{
-            method: "GET",
-            headers:{
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
+    const updateUser = async (userId) => {
+        try {
+            const data = await refreshUser(userId);
+
             if(!data.success){
-                setMessage(data.message);
+                return toast.error(data.message);
             }
-            setUsersCount(data.users_count);
-        })
-    }, []);
+
+            setUsers(prevUsers =>
+                prevUsers.map(user =>
+                    user.id === userId ? data.user : user
+                )
+            );
+
+        } catch(error) {
+            toast.error("Failed to refresh user");
+            console.error(error);
+        }
+    };
+    useEffect(() => {
+
+        const loadUsers = async () => {
+            try {
+
+                const usersData = await getUsers(currentPage, usersPerPage);
+
+                if(!usersData.success){
+                    return toast.error(usersData.message);
+                }
+
+                setUsers(usersData.users);
+                setTotalPages(usersData.totalPages);
+
+
+                const countData = await getUsersCount();
+
+                if(!countData.success){
+                    return toast.error(countData.message);
+                }
+
+                setUsersCount(countData.users_count);
+
+            } catch(error) {
+                toast.error("Failed to load users");
+                console.error(error);
+            }
+        };
+
+        loadUsers();
+
+    }, [currentPage]);
+
+    const executeAction = async (action, data) => {
+        try {
+            const response = await action(data);
+
+            if(!response.success){
+                return toast.error(response.message);
+            }
+
+            await updateUser(data.userId);
+
+            toast.success(response.message);
+
+        } catch(error) {
+            toast.error("Something went wrong");
+            console.error(error);
+        }
+    };
+
+
 
 
     return (
@@ -50,11 +110,10 @@ function AdminUsers() {
                 <p>{t("manage_application_users")}</p>
 
                 <button className="btn btn-primary">
-                    <Shield size={18}/>
+                    <ShieldUser size={18}/>
                     <span className="ms-2">{t("add_admin")}</span>
                 </button>
             </div>
-
             <div className="table-responsive admin-table">
                 <table className="table table-dark align-middle">
                     <thead>
@@ -70,7 +129,7 @@ function AdminUsers() {
                     </thead>
 
                     <tbody>
-                    {message}
+
                     {users.map(user => (
                         <tr key={user.id}>
                             <td>
@@ -95,7 +154,7 @@ function AdminUsers() {
                             </td>
 
                             <td>
-                                <span className={user.status === "ACTIVE" ? "badge badge-active" : "badge badge-banned"}>
+                                <span className={user.status === "ACTIVE" ? "badge badge-active" : user.status === "SUSPENDED" ? "badge badge-suspended" : "badge badge-banned"}>
                                     {user.status}
                                 </span>
                             </td>
@@ -107,19 +166,41 @@ function AdminUsers() {
                                     (
                                         <span className="admin-protected me-2" title="Protected. You cannot manage another admin">
                                             <Lock size={16}/>
-                                            Protected
+                                            {t("protected")}
                                         </span>
                                     )
                                     :
                                     (
-                                        <>
-                                            <button className="btn btn-sm btn-outline-warning me-2" title={t("suspend_user")}>
-                                                <CirclePause size={16}/>
-                                            </button>
 
-                                            <button className="btn btn-sm btn-outline-danger" title={t("ban_user")}>
-                                                <Ban size={16}/>
-                                            </button>
+
+                                        <>
+                                            {user.status === "ACTIVE" && (
+                                                <>
+                                                    <button className="btn btn-sm btn-outline-warning me-2" title={t("suspend_user")} onClick={()=>{setSelectedUser(user);setSuspendModal(true)}}>
+                                                        <CirclePause size={16}/>
+                                                    </button>
+
+                                                    <button className="btn btn-sm btn-outline-danger" title={t("ban_user")} onClick={()=>{setSelectedUser(user);setBanModal(true)}}>
+                                                        <Ban size={16}/>
+                                                    </button>
+                                                </>
+                                            )}
+                                            {user.status === "SUSPENDED" && (
+                                                <>
+                                                    <button className="btn btn-sm btn-outline-success me-2" title={t("unsuspend_user")} onClick={()=>{executeAction(unSuspendUser,{userId:user.id, userStatus:user.status})}}>
+                                                        <CirclePlay size={16} className="me-1"/>
+                                                        {t("unsuspend")}
+                                                    </button>
+                                                </>
+                                            )}
+                                            {user.status === "BANNED" && (
+                                                <>
+                                                    <button className="btn btn-sm btn-outline-success" title={t("unban_user")} onClick={()=>{executeAction(unBanUser,{userId:user.id, userStatus:user.status})}}>
+                                                        <ShieldCheck size={16} className="me-1"/>
+                                                        {t("unban")}
+                                                    </button>
+                                                </>
+                                            )}
                                         </>
                                     )
                                 }
@@ -159,16 +240,17 @@ function AdminUsers() {
                             <p>
                                 Role:
                                 <span className={user.role ? "badge badge-admin ms-2" : "badge badge-user ms-2"}>
-                        {user.role ? "Admin" : "User"}
-                    </span>
+                                    {user.role ? "Admin" : "User"}
+                                </span>
                             </p>
 
-                            <p>
-                                Status:
-                                <span className={user.status === "ACTIVE" ? "badge badge-active ms-2" : "badge badge-banned ms-2"}>
-                        {user.status}
-                    </span>
-                            </p>
+                            <div className="d-flex align-items-center">
+                                <span className="me-1">Status:</span>
+
+                                <span className={user.status === "ACTIVE" ? "badge badge-active" : user.status === "SUSPENDED" ? "badge badge-suspended" : "badge badge-banned"}>
+                                {user.status}
+                                </span>
+                            </div>
 
                             <p>
                                 Created:
@@ -190,15 +272,38 @@ function AdminUsers() {
                                     :
                                     (
                                         <>
-                                            <button className="btn btn-outline-warning me-2">
-                                                <CirclePause size={16}/>
-                                                <span className="ms-1">Suspend</span>
-                                            </button>
 
-                                            <button className="btn btn-outline-danger">
-                                                <Ban size={16}/>
-                                                <span className="ms-1">Ban</span>
-                                            </button>
+                                            {user.status === "ACTIVE" && (
+                                                <>
+                                                    <button className="btn btn-outline-warning me-2" onClick={()=>{setSelectedUser(user);setSuspendModal(true)}} >
+                                                        <CirclePause size={16}/>
+                                                        <span className="ms-1">{t("suspend")}</span>
+                                                    </button>
+
+                                                    <button className="btn btn-outline-danger" onClick={()=>{setSelectedUser(user);setBanModal(true)}}>
+                                                        <Ban size={16}/>
+                                                        <span className="ms-1">{t("ban")}</span>
+                                                    </button>
+                                                </>
+                                            )}
+                                            {user.status === "SUSPENDED" && (
+                                                <>
+                                                    <button className="btn btn-outline-success me-2" onClick={()=>{executeAction(unSuspendUser,{userId:user.id, userStatus:user.status})}}>
+                                                        <CirclePlay size={16}/>
+                                                        <span className="ms-1" >{t("unsuspend")}</span>
+                                                    </button>
+                                                </>
+                                            )}
+                                            {user.status === "BANNED" && (
+                                                <>
+                                                    <button className="btn btn-outline-success" onClick={()=>{executeAction(unBanUser,{userId:user.id, userStatus:user.status})}}>
+                                                        <ShieldCheck size={16}/>
+                                                        <span className="ms-1">{t("unban")}</span>
+                                                    </button>
+                                                </>
+                                            )}
+
+
                                         </>
                                     )
                             }
@@ -206,7 +311,46 @@ function AdminUsers() {
 
                     </div>
                 ))}
+
             </div>
+            <Pagination currentPage={currentPage} totalPages={totalPages} changePage={changePage}/>
+
+            <AdminBanModal
+                isOpen={banModal}
+                onClose={()=>{
+                    setBanModal(false);
+                    setSelectedUser(null);
+                }}
+                onConfirm={(reason)=>{
+                    executeAction(banUser,{
+                        userId:selectedUser.id,
+                        userStatus:selectedUser.status,
+                        banReason:reason
+                    });
+                    setBanModal(false);
+                    setSelectedUser(null);
+                }}
+            />
+
+            <AdminSuspendModal
+                isOpen={suspendModal}
+                onClose={()=>{
+                    setSuspendModal(false);
+                    setSelectedUser(null);
+                }}
+                onConfirm={(data)=>{
+
+                    executeAction(suspendUser,{
+                        userId:selectedUser.id,
+                        userStatus:selectedUser.status,
+                        suspendReason:data.reason,
+                        suspendUntil:data.until
+                    });
+
+                    setSuspendModal(false);
+                    setSelectedUser(null);
+                }}
+            />
         </div>
     );
 }

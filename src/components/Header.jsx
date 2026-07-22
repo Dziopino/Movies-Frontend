@@ -58,7 +58,7 @@ function Header() {
 
                         <BackButton />
                         {userData.role === 1 && (
-                            <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/admin_dashboard");}}>{t("admin_panel")}</button>
+                            <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/admin/dashboard");}}>{t("admin_panel")}</button>
                         )}
 
 

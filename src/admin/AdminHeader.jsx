@@ -28,25 +28,25 @@ function AdminHeader() {
                     <ul className="navbar-nav ms-5">
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/admin_dashboard">
+                            <NavLink className="nav-link" to="/admin/dashboard">
                                 {t("dashboard")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/admin_films">
+                            <NavLink className="nav-link" to="/admin/films">
                                 {t("movies")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/admin_users">
+                            <NavLink className="nav-link" to="/admin/users">
                                 {t("users")}
                             </NavLink>
                         </li>
 
                         <li className="nav-item">
-                            <NavLink className="nav-link" to="/admin_genres">
+                            <NavLink className="nav-link" to="/admin/genres">
                                 {t("genres")}
                             </NavLink>
                         </li>

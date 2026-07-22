@@ -50,10 +50,10 @@ function App() {
 
                     <Route element={<AdminLayout/>}>
 
-                        <Route path="/admin_dashboard" element={<AdminDashboard />}/>
-                        <Route path="/admin_films" element={<AdminFilms />}/>
-                        <Route path="/admin_users" element={<AdminUsers />}/>
-                        <Route path="/admin_genres" element={<AdminGenres />}/>
+                        <Route path="/admin/dashboard" element={<AdminDashboard />}/>
+                        <Route path="/admin/films" element={<AdminFilms />}/>
+                        <Route path="/admin/users" element={<AdminUsers />}/>
+                        <Route path="/admin/genres" element={<AdminGenres />}/>
 
                     </Route>
 

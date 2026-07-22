@@ -336,3 +336,48 @@ code {
     background-color: #e4606d;
     color: #16171d;
 }
+
+.admin-modal-overlay {
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0,0,0,0.65);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+
+.admin-modal {
+
+    width: 420px;
+
+    background: #16171d;
+
+    color: white;
+
+    padding: 25px;
+
+    border-radius: 12px;
+
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+
+.admin-modal h3 {
+    margin: 0;
+}
+
+
+.admin-modal textarea {
+    min-height: 100px;
+}
+
+.badge-suspended {
+    background-color: #ffc107;
+    color: #000;
+}
