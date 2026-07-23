@@ -6,6 +6,8 @@ import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
 import config from "../config/api.js";
+import Pagination from "./Pagination.jsx";
+import useDebounce from "../hooks/useDebounce.js";
 
 
 
@@ -25,34 +27,58 @@ function Home() {
 
     const [search, setSearch] = useState("");
 
-    const filteredFilms = films.filter(film =>
-        film.title.toLowerCase().includes(search.toLowerCase())
-    );
+    const debouncedSearch = useDebounce(search, 500);
+
+    const [currentPage,setCurrentPage] = useState(1);
+
+    const [totalPages,setTotalPages] = useState(0);
 
     const reloadFilms = () => {
+
         fetch(`${config.apiUrl}/getFilms`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                ...(localStorage.getItem("token") && {
+                    "Authorization":`Bearer ${localStorage.getItem("token")}`
+                })
             },
-            body: JSON.stringify({language: userData.language_code})
+            body:JSON.stringify({
+                language:userData.language_code,
+                page:currentPage,
+                search:debouncedSearch.trim()
+            })
         })
-            .then(res => res.json())
-            .then(data => {
-                if (data.body && data.body.length > 0) {
-                    setFilms(data.body);
-                } else {
-                    alert(data.message);
-                }
+            .then(res=>res.json())
+            .then(data=>{
+
+                setFilms(data.body);
+                setTotalPages(data.totalPages);
+
             });
+
     };
+
+    const changePage = (page) => {
+
+        setCurrentPage(page);
+
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCurrentPage(1);
+    },[debouncedSearch]);
 
 
     useEffect(() => {
         reloadFilms();
-    },[userData.id]);
-
+    },[userData.id, userData.language_code, currentPage, debouncedSearch]);
 
 
 
@@ -63,9 +89,7 @@ function Home() {
                     <div className="container d-flex justify-content-center align-items-center">
                         <div className="row w-100 justify-content-center">
                             <div className="col-12 col-md-6">
-                                <div
-                                    className={`alert bg-dark text-white text-center shadow-lg p-4 fade-warning ${fadeWarning ? "fade-out" : ""}`}
-                                >
+                                <div className={`alert bg-dark text-white text-center shadow-lg p-4 fade-warning ${fadeWarning ? "fade-out" : ""}`}>
 
                                     <p className="text-danger h2 mb-3">You can't go here as guest!</p>
 
@@ -88,7 +112,7 @@ function Home() {
 
                 <div className="row  row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 g-5">
 
-                    {filteredFilms.map((film) => (
+                    {films.map((film) => (
                         <div className="col" key={film.id}>
                             <div className="card h-100 bg-dark d-flex flex-column">
 
@@ -118,6 +142,7 @@ function Home() {
                         </div>
                     ))}
                 </div>
+                <Pagination currentPage={currentPage} totalPages={totalPages} changePage={changePage}/>
             </div>
         </>
     )

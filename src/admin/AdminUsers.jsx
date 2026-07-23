@@ -1,12 +1,14 @@
-import {Ban, Lock, CirclePause, ShieldUser, CirclePlay, ShieldCheck} from "lucide-react";
+import {Ban, Lock, CirclePause, ShieldUser, CirclePlay, ShieldCheck, ShieldPlus} from "lucide-react";
 import {useEffect, useState} from "react";
 import {useTranslation} from "react-i18next";
 import AdminBanModal from "./AdminBanModal.jsx";
 import AdminSuspendModal from "./AdminSuspendModal.jsx";
 import toast from "react-hot-toast";
 import config from "../config/api.js";
-import {getUsers, getUsersCount, refreshUser, banUser, suspendUser, unSuspendUser, unBanUser} from "../services/adminService.js";
+import {getUsers, getUsersCount, refreshUser, banUser, suspendUser, unSuspendUser, unBanUser, promoteUser} from "../services/adminService.js";
 import Pagination from "../components/Pagination.jsx";
+import AdminPasswordAuthModal from "./AdminPasswordAuthModal.jsx";
+import SearchBar from "../components/SearchBar.jsx";
 
 function AdminUsers() {
 
@@ -20,6 +22,7 @@ function AdminUsers() {
     const [currentPage, setCurrentPage] = useState(1);
     const usersPerPage = 50;
     const [totalPages, setTotalPages] = useState(0);
+    const [adminPasswordAuthModal, setAdminPasswordAuthModal] = useState(false);
 
     const changePage = (page) => {
         setCurrentPage(page);
@@ -34,7 +37,7 @@ function AdminUsers() {
             const data = await refreshUser(userId);
 
             if(!data.success){
-                return toast.error(data.message);
+                return toast.error(t(data.message));
             }
 
             setUsers(prevUsers =>
@@ -44,41 +47,41 @@ function AdminUsers() {
             );
 
         } catch(error) {
-            toast.error("Failed to refresh user");
+            toast.error("failed_to_refresh_user");
             console.error(error);
         }
     };
-    useEffect(() => {
 
-        const loadUsers = async () => {
-            try {
+    const loadUsers = async () => {
+        try {
 
-                const usersData = await getUsers(currentPage, usersPerPage);
+            const usersData = await getUsers(currentPage, usersPerPage);
 
-                if(!usersData.success){
-                    return toast.error(usersData.message);
-                }
-
-                setUsers(usersData.users);
-                setTotalPages(usersData.totalPages);
-
-
-                const countData = await getUsersCount();
-
-                if(!countData.success){
-                    return toast.error(countData.message);
-                }
-
-                setUsersCount(countData.users_count);
-
-            } catch(error) {
-                toast.error("Failed to load users");
-                console.error(error);
+            if(!usersData.success){
+                return toast.error(t(usersData.message));
             }
-        };
 
+            setUsers(usersData.users);
+            setTotalPages(usersData.totalPages);
+
+
+            const countData = await getUsersCount();
+
+            if(!countData.success){
+                return toast.error(t(countData.message));
+            }
+
+            setUsersCount(countData.users_count);
+
+        } catch(error) {
+            toast.error("failed_to_load_users");
+            console.error(error);
+        }
+    };
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadUsers();
-
     }, [currentPage]);
 
     const executeAction = async (action, data) => {
@@ -86,18 +89,38 @@ function AdminUsers() {
             const response = await action(data);
 
             if(!response.success){
-                return toast.error(response.message);
+                return toast.error(t(response.message));
             }
 
             await updateUser(data.userId);
 
-            toast.success(response.message);
+
+            toast.success(t(response.message));
 
         } catch(error) {
-            toast.error("Something went wrong");
+            toast.error(t("something_went_wrong"));
             console.error(error);
         }
     };
+
+    const checkSuspensions = () => {
+
+        fetch(`${config.apiUrl}/checkSuspensions`,{
+            method:"POST",
+            headers:{
+                "Authorization":`Bearer ${localStorage.getItem("token")}`
+            }
+        })
+            .then(res=>res.json())
+            .then(data=>{
+                if (!data.success){
+                    return toast.error(t(data.message));
+                }
+                toast.success(t(data.message) + ": " + data.updated);
+                loadUsers();
+            });
+
+    }
 
 
 
@@ -105,10 +128,15 @@ function AdminUsers() {
     return (
         <div className="container admin-users mb-4">
             <h1 className="text-center text-">{t("users")}<span className="users-count fw-normal ms-2">({usersCount})</span></h1>
+            <p>{t("manage_application_users")}</p>
 
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <p>{t("manage_application_users")}</p>
+            <div className="d-flex justify-content-between align-items-center gap-3 mb-4 mt-4">
+                <SearchBar/>
 
+                <button className="btn btn-warning" onClick={() => {checkSuspensions();}}>
+                    <ShieldCheck size={18}/>
+                    <span className="ms-2">{t("check_suspensions")}</span>
+                </button>
                 <button className="btn btn-primary">
                     <ShieldUser size={18}/>
                     <span className="ms-2">{t("add_admin")}</span>
@@ -176,6 +204,9 @@ function AdminUsers() {
                                         <>
                                             {user.status === "ACTIVE" && (
                                                 <>
+                                                    <button className="btn btn-sm btn-outline-success me-2" title={t("promote_to_admin")} onClick={()=>{setSelectedUser(user);setAdminPasswordAuthModal(true)}}>
+                                                        <ShieldPlus size={16}/>
+                                                    </button>
                                                     <button className="btn btn-sm btn-outline-warning me-2" title={t("suspend_user")} onClick={()=>{setSelectedUser(user);setSuspendModal(true)}}>
                                                         <CirclePause size={16}/>
                                                     </button>
@@ -275,6 +306,12 @@ function AdminUsers() {
 
                                             {user.status === "ACTIVE" && (
                                                 <>
+                                                    <button className="btn btn-outline-success me-2" onClick={()=>{setSelectedUser(user);setAdminPasswordAuthModal(true)}} >
+                                                        <ShieldPlus size={16}/>
+                                                        <span className="ms-1">{t("promote")}</span>
+                                                    </button>
+
+
                                                     <button className="btn btn-outline-warning me-2" onClick={()=>{setSelectedUser(user);setSuspendModal(true)}} >
                                                         <CirclePause size={16}/>
                                                         <span className="ms-1">{t("suspend")}</span>
@@ -348,6 +385,24 @@ function AdminUsers() {
                     });
 
                     setSuspendModal(false);
+                    setSelectedUser(null);
+                }}
+            />
+
+            <AdminPasswordAuthModal
+                isOpen={adminPasswordAuthModal}
+                onClose={()=>{
+                    setAdminPasswordAuthModal(false);
+                    setSelectedUser(null);
+                }}
+                onConfirm={(password)=>{
+
+                    executeAction(promoteUser,{
+                        userId:selectedUser.id,
+                        password
+                    });
+
+                    setAdminPasswordAuthModal(false);
                     setSelectedUser(null);
                 }}
             />

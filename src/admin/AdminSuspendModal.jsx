@@ -1,11 +1,12 @@
-import {useRef, useState} from "react";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
 function AdminSuspendModal({isOpen, onClose, onConfirm}) {
 
     const [reason, setReason] = useState("");
     const [until, setUntil] = useState("");
-
     const minDate = new Date().toISOString().slice(0,16);
+    const {t} = useTranslation();
 
     if(!isOpen){
         return null;
@@ -23,13 +24,13 @@ function AdminSuspendModal({isOpen, onClose, onConfirm}) {
     return (
         <div className="admin-modal-overlay">
             <form className="admin-modal" onSubmit={confirmSuspend}>
-                <h3>Suspend user</h3>
+                <h3>{t("suspend_user")}</h3>
 
                 <label className="mt-3" htmlFor="suspendReason">
-                    Suspend reason
+                    {t("suspend_reason")}
                 </label>
 
-                <textarea id="suspendReason" className="form-control mt-2" placeholder="Enter suspend reason..." value={reason} onChange={(e)=>setReason(e.target.value)}
+                <textarea id="suspendReason" className="form-control mt-2" placeholder={t("enter_suspend_reason")} value={reason} onChange={(e)=>setReason(e.target.value)}
                           onKeyDown={(e)=>{
                               if(e.key === "Enter" && !e.shiftKey){
                                   e.preventDefault();
@@ -39,7 +40,7 @@ function AdminSuspendModal({isOpen, onClose, onConfirm}) {
                 />
 
                 <label className="mt-3" htmlFor="suspendUntil">
-                    Suspended until
+                    {t("suspend_until")}
                 </label>
 
                 <input min={minDate} id="suspendUntil" type="datetime-local" className="form-control mt-2" value={until} onChange={(e)=>{setUntil(e.target.value);e.target.blur();}}/>
@@ -47,12 +48,12 @@ function AdminSuspendModal({isOpen, onClose, onConfirm}) {
                 <div className="d-flex justify-content-end gap-2 mt-4">
 
                     <button className="btn btn-secondary" type="button" onClick={onClose}>
-                        Cancel
+                        {t("cancel")}
                     </button>
 
 
                     <button className="btn btn-warning" type="submit" disabled={!reason.trim() || !until}>
-                        Suspend
+                        {t("suspend")}
                     </button>
 
                 </div>

@@ -7,11 +7,7 @@ function Pagination({currentPage, totalPages, changePage}) {
     return (
         <div className="pagination d-flex justify-content-center align-items-center gap-1 mt-4">
 
-            <button
-                className="btn btn-outline-light"
-                disabled={currentPage === 1}
-                onClick={()=>changePage(currentPage - 1)}
-            >
+            <button className="btn btn-outline-light" disabled={currentPage === 1} onClick={()=>changePage(currentPage - 1)}>
                 &lt;
             </button>
 
@@ -31,11 +27,7 @@ function Pagination({currentPage, totalPages, changePage}) {
                 Array.from({length: totalPages}, (_,index)=>index+1)
                     .filter(page => page >= currentPage - 2 && page <= currentPage + 2)
                     .map(page => (
-                        <button
-                            key={page}
-                            className={currentPage === page ? "btn btn-light" : "btn btn-outline-light"}
-                            onClick={()=>changePage(page)}
-                        >
+                        <button key={page} className={currentPage === page ? "btn btn-light" : "btn btn-outline-light"} onClick={()=>changePage(page)}>
                             {page}
                         </button>
                     ))
@@ -53,11 +45,7 @@ function Pagination({currentPage, totalPages, changePage}) {
             )}
 
 
-            <button
-                className="btn btn-outline-light"
-                disabled={currentPage === totalPages}
-                onClick={()=>changePage(currentPage + 1)}
-            >
+            <button className="btn btn-outline-light" disabled={currentPage === totalPages} onClick={()=>changePage(currentPage + 1)}>
                 &gt;
             </button>
 

@@ -6,46 +6,67 @@ import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
 import config from "../config/api.js";
+import useDebounce from "../hooks/useDebounce.js";
+import Pagination from "./Pagination.jsx";
 
 
 function Watched() {
 
     const navigate = useNavigate();
-
     const {userData} = useAuth();
-
     const {likeToggle, watchedToggle} = useFilmContext();
-
     const {showWarningPopup} = useWarningContext();
-
     const {t} = useTranslation();
-
     const [watched, setWatched] = useState([]);
-
     const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search,500);
+    const [currentPage,setCurrentPage] = useState(1);
+    const [totalPages,setTotalPages] = useState(0);
 
-    const filteredFilms = watched.filter(film =>
-        film.title.toLowerCase().includes(search.toLowerCase())
-    )
+    const changePage = (page)=>{
 
+        setCurrentPage(page);
 
+        window.scrollTo({
+            top:0,
+            behavior:"smooth"
+        });
+
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilms = useCallback(() =>{
+
         fetch(`${config.apiUrl}/watchedGet`,{
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": "Bearer " + localStorage.getItem("token")
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer " + localStorage.getItem("token")
             },
-        }).then((res) => res.json()).then((data) => {
-            if (data.message === "Watched got successfully") {
-                setWatched(data.body);
-            }else{
-                alert(data.message);
-            }
+            body:JSON.stringify({
+                page:currentPage,
+                search:debouncedSearch
+            })
         })
-    })
+            .then(res=>res.json())
+            .then(data=>{
+                if(data.message === "Watched got successfully"){
+                    setWatched(data.body);
+                    setTotalPages(data.totalPages);
+                }
+                else{
+                    alert(data.message);
+                }
+            })
+
+    },[currentPage,debouncedSearch]);
+
+    useEffect(()=>{
+
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setCurrentPage(1);
+
+    },[debouncedSearch]);
 
     useEffect(() => {
 
@@ -55,7 +76,7 @@ function Watched() {
             reloadFilms();
         }
 
-    }, [userData.id]);
+    },[userData.id,currentPage,debouncedSearch]);
 
     return (
         <>
@@ -64,7 +85,7 @@ function Watched() {
                 <PageHeader setSearch={setSearch} title={t("watched")} />
 
                 <div className="row  row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 g-5">
-                    {filteredFilms.map((watched) => (
+                    {watched.map((watched) => (
                         <div className="col" key={watched.id}>
                             <div className="card h-100 bg-dark d-flex flex-column">
 
@@ -88,13 +109,16 @@ function Watched() {
                                     )
 
                                     }
-
                                 </div>
-
                             </div>
                         </div>
                     ))}
                 </div>
+                <Pagination
+                    currentPage= {currentPage}
+                    totalPages = {totalPages}
+                    changePage = {changePage}
+                />
             </div>
         </>
     )

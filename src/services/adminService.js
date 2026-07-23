@@ -33,3 +33,7 @@ export const unSuspendUser = (data) => {
 export const unBanUser = (data) => {
     return postRequest("unBanUser", data);
 };
+
+export const promoteUser = (data) => {
+    return postRequest("promoteUser", data);
+};
