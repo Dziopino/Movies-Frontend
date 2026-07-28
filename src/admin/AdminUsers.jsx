@@ -5,15 +5,25 @@ import AdminBanModal from "./AdminBanModal.jsx";
 import AdminSuspendModal from "./AdminSuspendModal.jsx";
 import toast from "react-hot-toast";
 import config from "../config/api.js";
-import {getUsers, getUsersCount, refreshUser, banUser, suspendUser, unSuspendUser, unBanUser, promoteUser} from "../services/adminService.js";
+import {
+    getUsers,
+    refreshUser,
+    banUser,
+    suspendUser,
+    unSuspendUser,
+    unBanUser,
+    promoteUser,
+    addAdmin
+} from "../services/adminService.js";
 import Pagination from "../components/Pagination.jsx";
 import AdminPasswordAuthModal from "./AdminPasswordAuthModal.jsx";
 import SearchBar from "../components/SearchBar.jsx";
+import useDebounce from "../hooks/useDebounce.js";
+import AdminAddAdminModal from "./AdminAddAdminModal.jsx";
 
 function AdminUsers() {
 
     const {t} = useTranslation();
-
     const [users, setUsers] = useState([]);
     const [usersCount, setUsersCount] = useState(0);
     const [banModal, setBanModal] = useState(false);
@@ -23,6 +33,9 @@ function AdminUsers() {
     const usersPerPage = 50;
     const [totalPages, setTotalPages] = useState(0);
     const [adminPasswordAuthModal, setAdminPasswordAuthModal] = useState(false);
+    const [search, setSearch] = useState("");
+    const debouncedSearch = useDebounce(search, 500);
+    const [addAdminModal,setAddAdminModal] = useState(false);
 
     const changePage = (page) => {
         setCurrentPage(page);
@@ -55,7 +68,7 @@ function AdminUsers() {
     const loadUsers = async () => {
         try {
 
-            const usersData = await getUsers(currentPage, usersPerPage);
+            const usersData = await getUsers(currentPage, usersPerPage, debouncedSearch.trim());
 
             if(!usersData.success){
                 return toast.error(t(usersData.message));
@@ -63,15 +76,7 @@ function AdminUsers() {
 
             setUsers(usersData.users);
             setTotalPages(usersData.totalPages);
-
-
-            const countData = await getUsersCount();
-
-            if(!countData.success){
-                return toast.error(t(countData.message));
-            }
-
-            setUsersCount(countData.users_count);
+            setUsersCount(usersData.users_count);
 
         } catch(error) {
             toast.error("failed_to_load_users");
@@ -81,10 +86,15 @@ function AdminUsers() {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        loadUsers();
-    }, [currentPage]);
+        setCurrentPage(1);
+    }, [debouncedSearch]);
 
-    const executeAction = async (action, data) => {
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadUsers();
+    }, [currentPage, debouncedSearch]);
+
+    const executeAction = async (action, data, reloadList = false) => {
         try {
             const response = await action(data);
 
@@ -92,8 +102,11 @@ function AdminUsers() {
                 return toast.error(t(response.message));
             }
 
-            await updateUser(data.userId);
-
+            if (reloadList) {
+                await loadUsers();
+            } else {
+                await updateUser(data.userId);
+            }
 
             toast.success(t(response.message));
 
@@ -131,13 +144,13 @@ function AdminUsers() {
             <p>{t("manage_application_users")}</p>
 
             <div className="d-flex justify-content-between align-items-center gap-3 mb-4 mt-4">
-                <SearchBar/>
+                <SearchBar setSearch={setSearch}/>
 
-                <button className="btn btn-warning" onClick={() => {checkSuspensions();}}>
+                <button className="btn btn-warning" onClick={() => {checkSuspensions()}}>
                     <ShieldCheck size={18}/>
                     <span className="ms-2">{t("check_suspensions")}</span>
                 </button>
-                <button className="btn btn-primary">
+                <button className="btn btn-primary" onClick={() => {setAddAdminModal(true)}}>
                     <ShieldUser size={18}/>
                     <span className="ms-2">{t("add_admin")}</span>
                 </button>
@@ -162,7 +175,7 @@ function AdminUsers() {
                         <tr key={user.id}>
                             <td>
                                 <div className="d-flex align-items-center">
-                                    <img className="user-avatar" src={user.avatar_url === null ? "/guest.webp" : `${config.apiUrl}${user.avatar_url}`} alt={t("profile_picture")}/>
+                                    <img className="admin-table-image" src={user.avatar_url === null ? "/guest.webp" : `${config.apiUrl}${user.avatar_url}`} alt={t("profile_picture")}/>
 
                                     <div className="ms-3">
                                         <strong title={user.username}>{user.username}</strong>
@@ -250,7 +263,7 @@ function AdminUsers() {
                     <div className="user-card" key={user.id}>
 
                         <div className="d-flex align-items-center">
-                            <img src={user.avatar_url === null ? "/guest.webp" : user.avatar_url} className="user-avatar" alt="Profile picture"/>
+                            <img className="admin-table-image" src={user.avatar_url === null ? "/guest.webp" : `${config.apiUrl}${user.avatar_url}`} alt={t("profile_picture")}/>
 
                             <div className="ms-3 user-info">
                                 <strong title={user.username}>{user.username}</strong>
@@ -261,22 +274,22 @@ function AdminUsers() {
                         <hr/>
 
                         <div className="user-details">
-                            <p>Email: <span title={user.email}>{user.email}</span></p>
+                            <p>Email: <b>{user.email}</b></p>
 
                             <p>
-                                Language:
+                                {t("language")+": "}
                                 <b>{user.language}</b>
                             </p>
 
                             <p>
-                                Role:
+                                {t("role")+": "}
                                 <span className={user.role ? "badge badge-admin ms-2" : "badge badge-user ms-2"}>
                                     {user.role ? "Admin" : "User"}
                                 </span>
                             </p>
 
                             <div className="d-flex align-items-center">
-                                <span className="me-1">Status:</span>
+                                <span className="me-1">{t("status")+": "}</span>
 
                                 <span className={user.status === "ACTIVE" ? "badge badge-active" : user.status === "SUSPENDED" ? "badge badge-suspended" : "badge badge-banned"}>
                                 {user.status}
@@ -284,8 +297,8 @@ function AdminUsers() {
                             </div>
 
                             <p>
-                                Created:
-                                <b className="ms-2">
+                                {t("created")+": "}
+                                <b>
                                     {new Date(user.created_at).toLocaleDateString(user.language)}
                                 </b>
                             </p>
@@ -297,7 +310,7 @@ function AdminUsers() {
                                     (
                                         <span className="admin-protected">
                                             <Lock size={16}/>
-                                            Protected
+                                            {t("protected")}
                                         </span>
                                     )
                                     :
@@ -339,8 +352,6 @@ function AdminUsers() {
                                                     </button>
                                                 </>
                                             )}
-
-
                                         </>
                                     )
                             }
@@ -406,6 +417,27 @@ function AdminUsers() {
                     setSelectedUser(null);
                 }}
             />
+
+            <AdminAddAdminModal
+                isOpen={addAdminModal}
+                onClose={()=>{
+                    setAddAdminModal(false);
+                }}
+                onConfirm={(data)=>{
+
+                    executeAction(addAdmin,{
+                        username:data.username,
+                        email:data.email,
+                        password:data.password,
+                    },
+                        true
+                    );
+
+                    setAddAdminModal(false);
+
+                }}
+            />
+
         </div>
     );
 }

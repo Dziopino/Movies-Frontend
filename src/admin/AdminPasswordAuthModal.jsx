@@ -29,7 +29,7 @@ function AdminPasswordAuthModal({isOpen, onClose, onConfirm}) {
 
             <form className="admin-modal" onSubmit={confirmPassword}>
 
-                <h3>{t("confirm_promotion")}</h3>
+                <h3>{t("confirm_action")}</h3>
 
 
                 <label className="mt-3" htmlFor="password">
