@@ -289,7 +289,7 @@ code {
 }
 
 
-@media(max-width:768px){
+@media(max-width: 991.98px){
 
 
     .admin-table {
@@ -380,4 +380,173 @@ code {
 .badge-suspended {
     background-color: #ffc107;
     color: #000;
+}
+
+
+.admin-users .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.admin-users .users-count {
+    font-size: 1.25rem;
+    color: #6c757d;
+}
+
+.admin-users .table-card {
+    background-color: #1a1d21;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #2c3035;
+}
+
+.admin-users .table {
+    font-size: 0.92rem;
+    margin-bottom: 0;
+}
+
+.admin-users .table thead th {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #8b949e;
+    background-color: #16191d;
+    border-bottom: 2px solid #2c3035;
+    padding: 0.875rem 0.75rem;
+    white-space: nowrap;
+}
+
+.admin-users .table tbody td {
+    padding: 0.875rem 0.75rem;
+    border-color: #25282c;
+    vertical-align: middle;
+}
+
+.admin-users .table tbody tr:hover td {
+    background-color: #22262b;
+}
+
+
+.admin-users .admin-table-image {
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #2c3035;
+    background-color: #16191d;
+    flex-shrink: 0;
+}
+
+
+.admin-users .badge {
+    font-weight: 500;
+    font-size: 0.78rem;
+    padding: 0.4em 0.65em;
+    border-radius: 6px;
+    border: 1px solid transparent;
+}
+
+
+.status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.badge-active {
+    background-color: rgba(25, 135, 84, 0.15);
+    color: #75b798;
+    border-color: rgba(25, 135, 84, 0.3);
+}
+.badge-active-dot { background-color: #198754; }
+
+.badge-suspended {
+    background-color: rgba(255, 193, 7, 0.12);
+    color: #ffda6a;
+    border-color: rgba(255, 193, 7, 0.25);
+}
+.badge-suspended-dot { background-color: #ffc107; }
+
+.badge-banned {
+    background-color: rgba(220, 53, 69, 0.12);
+    color: #ea868f;
+    border-color: rgba(220, 53, 69, 0.25);
+}
+.badge-banned-dot { background-color: #dc3545; }
+
+.badge-admin {
+    background-color: rgba(13, 110, 253, 0.12);
+    color: #6ea8fe;
+    border-color: rgba(13, 110, 253, 0.25);
+}
+
+.badge-user {
+    background-color: rgba(108, 117, 125, 0.12);
+    color: #adb5bd;
+    border-color: rgba(108, 117, 125, 0.25);
+}
+
+.admin-users .btn-action {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 8px;
+    transition: transform 0.1s ease, background-color 0.15s ease;
+}
+
+.admin-users .btn-action:active {
+    transform: scale(0.92);
+}
+
+.admin-users .admin-protected {
+    font-size: 0.8rem;
+    color: #6c757d;
+    background: rgba(108, 117, 125, 0.1);
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid rgba(108, 117, 125, 0.15);
+}
+
+.admin-users .mobile-users .user-card {
+    background-color: #1a1d21;
+    border: 1px solid #2c3035;
+    border-radius: 14px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.admin-users .mobile-users .detail-label {
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #6c757d;
+    margin-bottom: 0.15rem;
+}
+
+.admin-users .empty-state {
+    background-color: #1a1d21;
+    border: 1px dashed #2c3035;
+    border-radius: 14px;
+}
+
+
+.spin-anim {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+
+.admin-users .pagination {
+    gap: 0.25rem;
 }

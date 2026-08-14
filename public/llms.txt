@@ -1,0 +1,26 @@
+# Cinemix
+
+> Cinemix is a web application for discovering and managing movies, built with React and Node.js.
+
+## Documentation
+
+- [README](https://github.com/Dziopino/Movies-Frontend)
+- [Backend](https://github.com/Dziopino/Movies-Backend)
+
+## Application
+
+- [Cinemix](http://localhost:5173/)
+
+## Features
+
+- Movie browsing and searching
+- Movie details and ratings
+- Movie genres
+- Multilingual movie titles and descriptions
+- User accounts and authentication
+- JWT-based authentication
+- Favorites and watched movies
+- Admin panel
+- User management
+- Genre management
+- Movie management

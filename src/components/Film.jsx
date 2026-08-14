@@ -40,7 +40,6 @@ function Film() {
 
             <div className="row align-items-center justify-content-center w-100" style={{ maxWidth: "1000px" }}>
 
-                {/* POSTER */}
                 <div className="col-md-4 mb-4 mb-md-0 d-flex justify-content-center">
                     <div className="bg-dark rounded shadow-lg overflow-hidden" style={{ width: "100%" }}>
                         <img src={`/${film.poster_url}`} alt={film.title} className="img-fluid w-100" style={{ objectFit: "cover" }}/>

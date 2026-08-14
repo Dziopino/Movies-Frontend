@@ -126,6 +126,10 @@ const resources = {
             registered_successfully:"Registered successfully",
             password_hashing_error:"Password hashing error",
             admin_created_successfully:"Admin created successfully",
+            no_users_found:"No users found",
+            no_genres_found:"No genres found",
+            no_films_found:"No films found",
+            try_different_search:"Try different search",
         }
     },
     pl: {
@@ -253,6 +257,10 @@ const resources = {
             registered_successfully:"Zarejestrowano pomyślnie",
             password_hashing_error:"Błąd podczas hashowania hasła",
             admin_created_successfully:"Admin stworzony pomyślnie",
+            no_users_found:"Nie znaleziono żadnych użytkowników",
+            no_genres_found:"Nie znaleziono żadnych gatunków",
+            no_films_found:"Nie znaleziono żadnych filmów",
+            try_different_search:"Spróbuj wyszukać coś innego"
         }
     }
 };

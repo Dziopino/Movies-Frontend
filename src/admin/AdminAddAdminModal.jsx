@@ -37,7 +37,6 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
             password
         });
 
-
         setUsername("");
         setEmail("");
         setPassword("");
@@ -58,25 +57,13 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
                     {t("username")}
                 </label>
 
-                <input
-                    id="username"
-                    type="text"
-                    className="form-control mt-2"
-                    value={username}
-                    onChange={(e)=>setUsername(e.target.value)}
-                />
-
+                <input id="username" type="text" className="form-control mt-2" value={username} onChange={(e)=>setUsername(e.target.value)}/>
 
                 <label className="mt-3" htmlFor="email">
                     {t("email")}
                 </label>
 
-                <input
-                    id="email"
-                    type="email"
-                    className="form-control mt-2"
-                    value={email}
-                    onChange={(e)=>setEmail(e.target.value)}
+                <input id="email" type="email" className="form-control mt-2" value={email} onChange={(e)=>setEmail(e.target.value)}
                 />
 
 
@@ -84,13 +71,7 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
                     {t("password")}
                 </label>
 
-                <input
-                    id="password"
-                    type="password"
-                    className="form-control mt-2"
-                    value={password}
-                    onChange={(e)=>setPassword(e.target.value)}
-                />
+                <input id="password" type="password" className="form-control mt-2" value={password} onChange={(e)=>setPassword(e.target.value)}/>
 
                 <PasswordValidator password={password}/>
 
@@ -99,13 +80,7 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
                     {t("confirm_password")}
                 </label>
 
-                <input
-                    id="confirmPassword"
-                    type="password"
-                    className="form-control mt-2"
-                    value={confirmPassword}
-                    onChange={(e)=>setConfirmPassword(e.target.value)}
-                />
+                <input id="confirmPassword" type="password" className="form-control mt-2" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}/>
 
 
                 {message && (
@@ -117,19 +92,12 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
 
                 <div className="d-flex justify-content-end gap-2 mt-4">
 
-                    <button
-                        className="btn btn-secondary"
-                        type="button"
-                        onClick={onClose}
-                    >
+                    <button className="btn btn-secondary" type="button" onClick={onClose}>
                         {t("cancel")}
                     </button>
 
 
-                    <button
-                        className="btn btn-primary"
-                        type="submit"
-                        disabled={
+                    <button className="btn btn-primary" type="submit" disabled={
                             !username.trim() ||
                             !email.trim() ||
                             !password ||

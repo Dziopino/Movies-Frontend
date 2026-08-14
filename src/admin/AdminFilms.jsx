@@ -1,22 +1,20 @@
-import {useTranslation} from "react-i18next";
-import {useEffect, useState} from "react";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce.js";
-import {banUser, deleteFilm, getFilms, promoteUser, refreshFilm, suspendUser,} from "../services/adminService.js";
+import { deleteFilm, getFilms, refreshFilm } from "../services/adminService.js";
 import toast from "react-hot-toast";
 import SearchBar from "../components/SearchBar.jsx";
-import {CirclePlus, Trash} from "lucide-react";
+import { CirclePlus, Trash, SearchX, Loader2 } from "lucide-react";
 import Pagination from "../components/Pagination.jsx";
-import AdminSuspendModal from "./AdminSuspendModal.jsx";
 import AdminPasswordAuthModal from "./AdminPasswordAuthModal.jsx";
 import useAuth from "../hooks/useAuth.js";
+import IconButton from "../components/IconButton.jsx";
 
 function AdminFilms() {
-
-
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const [films, setFilms] = useState([]);
     const [filmsCount, setFilmsCount] = useState(0);
-    const [suspendModal, setSuspendModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [selectedFilm, setSelectedFilm] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const filmsPerPage = 50;
@@ -24,52 +22,38 @@ function AdminFilms() {
     const [adminPasswordAuthModal, setAdminPasswordAuthModal] = useState(false);
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
-    const {userData} = useAuth();
+    const { userData } = useAuth();
 
     const changePage = (page) => {
         setCurrentPage(page);
-        window.scrollTo({
-            top: 0,
-            behavior: "smooth"
-        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const updateFilm = async (filmId) => {
         try {
             const data = await refreshFilm(filmId);
-
-            if(!data.success){
-                return toast.error(t(data.message));
-            }
-
-            setFilms(prevFilms =>
-                prevFilms.map(film =>
-                    film.id === filmId ? data.film : film
-                )
-            );
-
-        } catch(error) {
+            if (!data.success) return toast.error(t(data.message));
+            setFilms((prev) => prev.map((f) => (f.id === filmId ? data.film : f)));
+        } catch (error) {
             toast.error("failed_to_refresh_films");
             console.error(error);
         }
     };
 
     const loadFilms = async () => {
+        setIsLoading(true);
         try {
-
             const filmsData = await getFilms(currentPage, filmsPerPage, debouncedSearch.trim());
-
-            if(!filmsData.success){
-                return toast.error(t(filmsData.message));
-            }
+            if (!filmsData.success) return toast.error(t(filmsData.message));
 
             setFilms(filmsData.films);
             setTotalPages(filmsData.totalPages);
             setFilmsCount(filmsData.films_count);
-
-        } catch(error) {
+        } catch (error) {
             toast.error("failed_to_load_films");
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -81,175 +65,180 @@ function AdminFilms() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         loadFilms();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentPage, debouncedSearch]);
 
     const executeAction = async (action, data, reloadList = false) => {
         try {
             const response = await action(data);
+            if (!response.success) return toast.error(t(response.message));
 
-            if(!response.success){
-                return toast.error(t(response.message));
-            }
-
-            if (reloadList) {
-                await loadFilms();
-            } else {
-                await updateFilm(data.filmId);
-            }
-
+            if (reloadList) await loadFilms();
+            else await updateFilm(data.filmId);
 
             toast.success(t(response.message));
-
-        } catch(error) {
+        } catch (error) {
             toast.error(t("something_went_wrong"));
             console.error(error);
         }
     };
 
+    const openAction = (setter, film) => {
+        setSelectedFilm(film);
+        setter(true);
+    };
+
     return (
-        <div className="container admin-users mb-4">
-            <h1 className="text-center text-">{t("movies")}<span className="users-count fw-normal ms-2">({filmsCount})</span></h1>
-            <p>{t("manage_application_films")}</p>
+        <div className="container admin-users mb-5">
 
-            <div className="d-flex justify-content-between align-items-center gap-3 mb-4 mt-4">
-                <SearchBar setSearch={setSearch}/>
-
-                <button className="btn btn-primary">
-                    <CirclePlus size={18}/>
-                    <span className="ms-2">{t("add_film")}</span>
-                </button>
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pt-3 gap-3">
+                <div>
+                    <h1 className="page-title mb-1">
+                        {t("movies")}
+                        <span className="users-count fw-normal ms-2">({filmsCount})</span>
+                    </h1>
+                    <p className="text-secondary mb-0">{t("manage_application_films")}</p>
+                </div>
             </div>
-            <div className="table-responsive admin-table">
-                <table className="table table-dark align-middle">
-                    <thead>
-                    <tr>
-                        <th>{t("film")}</th>
-                        <th>{t("rating")}</th>
-                        <th>{t("release_date")}</th>
-                        <th>{t("duration")}</th>
-                        <th className="text-end">{t("action")}</th>
-                    </tr>
-                    </thead>
 
-                    <tbody>
 
-                    {films.map(film => (
-                        <tr key={film.id}>
-                            <td>
-                                <div className="d-flex align-items-center">
-                                    <img className="admin-table-image" src={"/"+film.poster_url} alt={t("film_poster")}/>
+            <div className="d-flex flex-column flex-md-row gap-3 mb-4">
+                <div className="flex-grow-1">
+                    <SearchBar setSearch={setSearch} />
+                </div>
+                <div className="d-flex gap-2">
+                    <button className="btn btn-primary d-inline-flex align-items-center">
+                        <CirclePlus size={18} />
+                        <span className="ms-2">{t("add_film")}</span>
+                    </button>
+                </div>
+            </div>
 
-                                    <div className="ms-3">
-                                        <strong title={film.title}>{film.title}</strong>
-                                        <div className="small">ID: {film.id}</div>
+
+            {isLoading && (
+                <div className="text-center py-5 text-secondary">
+                    <Loader2 size={40} className="spin-anim mb-3" />
+                    <p className="mb-0">{t("loading") || "Ładowanie..."}</p>
+                </div>
+            )}
+
+
+            {!isLoading && films.length === 0 && (
+                <div className="empty-state text-center py-5">
+                    <SearchX size={48} className="text-secondary mb-3" />
+                    <h5 className="text-secondary">{t("no_films_found") || "Nie znaleziono filmów"}</h5>
+                    <p className="text-secondary small mb-0">{t("try_different_search") || "Spróbuj innego wyszukiwania"}</p>
+                </div>
+            )}
+
+
+            {!isLoading && films.length > 0 && (
+                <div className="card table-card border-0 shadow-sm mb-4 d-none d-lg-block">
+                    <div className="table-responsive">
+                        <table className="table table-dark table-hover align-middle mb-0">
+                            <thead>
+                            <tr>
+                                <th className="ps-4">{t("film")}</th>
+                                <th>{t("rating")}</th>
+                                <th>{t("release_date")}</th>
+                                <th>{t("duration")}</th>
+                                <th className="text-end pe-4">{t("action")}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {films.map((film) => (
+                                <tr key={film.id}>
+                                    <td className="ps-4">
+                                        <div className="d-flex align-items-center">
+                                            <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
+                                            <div className="ms-3">
+                                                <div className="fw-semibold text-light" title={film.title}>
+                                                    {film.title}
+                                                </div>
+                                                <div className="small text-secondary">ID: {film.id}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="text-secondary">{film.rating}</td>
+                                    <td className="text-secondary">
+                                        {new Date(film.release_date).toLocaleDateString(userData.language_code)}
+                                    </td>
+                                    <td className="text-secondary">
+                                        {parseInt(film.duration / 60)}h {film.duration % 60}min
+                                    </td>
+                                    <td className="text-end pe-4">
+                                        <IconButton variant="danger" icon={Trash} title={t("delete_film")} onClick={() => openAction(setAdminPasswordAuthModal, film)}/>
+                                    </td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
+
+            {!isLoading && films.length > 0 && (
+                <div className="d-lg-none mobile-users">
+                    {films.map((film) => (
+                        <div className="user-card" key={film.id}>
+                            <div className="d-flex align-items-center mb-3">
+                                <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
+                                <div className="ms-3 flex-grow-1 min-w-0">
+                                    <div className="fw-semibold text-truncate text-light" title={film.title}>
+                                        {film.title}
+                                    </div>
+                                    <div className="small text-secondary">ID: {film.id}</div>
+                                </div>
+                            </div>
+
+                            <div className="user-details">
+                                <div className="row g-2 small text-secondary">
+                                    <div className="col-6">
+                                        <span className="detail-label">{t("rating")}</span>
+                                        <div className="text-light">{film.rating}</div>
+                                    </div>
+                                    <div className="col-6">
+                                        <span className="detail-label">{t("release_date")}</span>
+                                        <div className="text-light">
+                                            {new Date(film.release_date).toLocaleDateString(userData.language_code)}
+                                        </div>
+                                    </div>
+                                    <div className="col-6">
+                                        <span className="detail-label">{t("duration")}</span>
+                                        <div className="text-light">
+                                            {parseInt(film.duration / 60)}h {film.duration % 60}min
+                                        </div>
                                     </div>
                                 </div>
-                            </td>
+                            </div>
 
-                            <td title={film.rating}>{film.rating}</td>
-
-                            <td>{new Date(film.release_date).toLocaleDateString(userData.language_code)}</td>
-
-                            <td>{parseInt(film.duration/60)}h {film.duration%60}min</td>
-
-
-                            <td className="text-end">
-                                <>
-                                    <button className="btn btn-sm btn-outline-danger" title={t("delete_film")} onClick={()=>{setSelectedFilm(film);setAdminPasswordAuthModal(true)}}>
-                                        <Trash size={16}/>
-                                    </button>
-                                </>
-                            </td>
-
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
-
-
-            <div className="mobile-users">
-                {films.map(film => (
-                    <div className="user-card" key={film.id}>
-
-                        <div className="d-flex align-items-center">
-                            <img className="admin-table-image" src={"/"+film.poster_url} alt={t("film_poster")}/>
-
-                            <div className="ms-3 user-info">
-                                <strong title={film.title}>{film.title}</strong>
-                                <div className="small">ID: {film.id}</div>
+                            <div className="mt-3 pt-3 border-top border-secondary border-opacity-25">
+                                <button
+                                    className="btn btn-outline-danger btn-sm d-inline-flex align-items-center"
+                                    onClick={() => openAction(setAdminPasswordAuthModal, film)}
+                                >
+                                    <Trash size={16} />
+                                    <span className="ms-1 small">{t("delete")}</span>
+                                </button>
                             </div>
                         </div>
+                    ))}
+                </div>
+            )}
 
-                        <hr/>
-
-                        <div className="user-details">
-                            <p title={film.rating}>
-                                {t("rating")+": "}
-                                <b>{film.rating}</b>
-                            </p>
-
-                            <p>
-                                {t("release_date")+": "}
-                                <b>{new Date(film.release_date).toLocaleDateString(userData.language_code)}</b>
-                            </p>
-
-                            <p>
-                                {t("duration")+": "}
-                                <b>{parseInt(film.duration/60)}h {film.duration%60}min</b>
-                            </p>
-                        </div>
-
-                        <div className="mt-3">
-                             <>
-
-                                 <button className="btn btn-outline-danger" onClick={()=>{setSelectedFilm(film);setAdminPasswordAuthModal(true)}}>
-                                     <Trash size={16}/>
-                                     <span className="ms-1">{t("delete")}</span>
-                                 </button>
-                             </>
-                        </div>
-
-                    </div>
-                ))}
-
-            </div>
-            <Pagination currentPage={currentPage} totalPages={totalPages} changePage={changePage}/>
+            {!isLoading && totalPages > 1 && (
+                <Pagination currentPage={currentPage} totalPages={totalPages} changePage={changePage} />
+            )}
 
             <AdminPasswordAuthModal
                 isOpen={adminPasswordAuthModal}
-                onClose={()=>{
+                onClose={() => {
                     setAdminPasswordAuthModal(false);
                     setSelectedFilm(null);
                 }}
-                onConfirm={(password)=>{
-                    executeAction(deleteFilm,{
-                        filmId:selectedFilm.id,
-                        password,
-                    },
-                        true
-                    );
+                onConfirm={(password) => {
+                    executeAction(deleteFilm, { filmId: selectedFilm.id, password }, true);
                     setAdminPasswordAuthModal(false);
-                    setSelectedFilm(null);
-                }}
-            />
-
-            <AdminSuspendModal
-                isOpen={suspendModal}
-                onClose={()=>{
-                    setSuspendModal(false);
-                    setSelectedFilm(null);
-                }}
-                onConfirm={(data)=>{
-
-                    executeAction(suspendUser,{
-                        filmId:selectedFilm.id,
-                        filmStatus:selectedFilm.status,
-                        suspendReason:data.reason,
-                        suspendUntil:data.until
-                    });
-
-                    setSuspendModal(false);
                     setSelectedFilm(null);
                 }}
             />
@@ -257,4 +246,4 @@ function AdminFilms() {
     );
 }
 
-export default AdminFilms
+export default AdminFilms;
