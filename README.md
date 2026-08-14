@@ -1,27 +1,27 @@
-# Movies Backend
+# Movies Frontend
 
-Backend aplikacji filmowej Full Stack, odpowiedzialny za API, logikę aplikacji, autoryzację użytkowników oraz komunikację z bazą danych.
+Frontend aplikacji filmowej Full Stack, zapewniający interfejs użytkownika oraz komunikację z backendem.
 
 ## Technologie
 
-- Node.js
-- Express.js
-- MySQL
-- JWT
-- REST API
+- React.js
+- JavaScript
+- React Router
+- Bootstrap
+- CSS
+- i18next
 
 ## Funkcjonalności
 
-- Rejestracja i logowanie użytkowników
-- Autoryzacja za pomocą JWT
-- Zarządzanie użytkownikami
-- Obsługa filmów i gatunków
-- Wyszukiwanie i filtrowanie
-- Paginacja
-- System ról i uprawnień
+- Rejestracja i logowanie
+- Obsługa kont użytkowników
+- Wyszukiwanie i filtrowanie filmów
+- Ulubione filmy
+- Oznaczanie filmów jako obejrzane
+- Wielojęzyczny interfejs
 - Panel administracyjny
-- Resetowanie hasła przez e-mail
-- Obsługa wielu języków
+- Zarządzanie użytkownikami
+- Responsywny interfejs
 
 ## Status
 
