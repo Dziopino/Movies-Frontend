@@ -2,7 +2,12 @@
 
 # 🎬 CINEMIX
 
-### Enterprise-Grade Full-Stack Movie Management Platform
+### Full-Stack Movie Catalog & Management Platform
+
+Cinemix is a full-stack web application for browsing, searching and managing a movie catalog. 
+Users can create accounts, manage favorites and watched movies, customize their profiles and use the application in multiple languages.
+
+The platform also includes a protected administration panel for managing users, genres and movie data.
 
 [![React](https://img.shields.io/badge/React-19.2.6-61DAFB?logo=react&logoColor=white)](https://react.dev/)
 [![Vite](https://img.shields.io/badge/Vite-8.0.12-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
@@ -12,7 +17,7 @@
 
 **React 19 · Vite · REST API · RBAC · i18n · Server-Side Pagination**
 
-[Frontend Repo](https://github.com/Dziopino/Movies-Frontend) · [Backend Repo](https://github.com/Dziopino/Movies-Backend) · [Live Demo](#) · [Screenshots](#-screenshots)
+[Frontend Repo](https://github.com/Dziopino/Movies-Frontend) · [Backend Repo](https://github.com/Dziopino/Movies-Backend) · [Live Demo (Coming Soon)](#) · [Screenshots](#-screenshots)
 
 </div>
 
@@ -38,7 +43,7 @@
 
 ## 🎯 Overview
 
-**Cinemix** is a production-ready, full-stack web application engineered for browsing, searching, and administrating a movie catalog. Built with a modular React 19 frontend and a robust Node.js/Express REST API, it demonstrates enterprise-level patterns including **Role-Based Access Control (RBAC)**, **JWT authentication**, **server-side pagination**, **debounced search**, and **internationalization (i18n)**.
+**Cinemix** is a fully functional, full-stack web application engineered for browsing, searching, and administrating a movie catalog. Built with a modular React 19 frontend and a robust Node.js/Express REST API, it demonstrates full-stack development patterns including **Role-Based Access Control (RBAC)**, **JWT authentication**, **server-side pagination**, **debounced search**, and **internationalization (i18n)**.
 
 The platform serves two distinct user personas:
 - **End Users** — browse films, manage personal watchlists, and interact with a localized UI.
@@ -124,7 +129,7 @@ The platform serves two distinct user personas:
 ## ✨ Key Features
 
 ### End-User Capabilities
-- **Dynamic Film Catalog** — Server-side rendered lists with localized titles and descriptions via `film_translations` relation.
+- **Dynamic Film Catalog** — Client-side rendered lists with localized titles and descriptions via `film_translations` relation.
 - **Intelligent Search** — Debounced query input (500ms) reducing API request overhead; backend SQL `LIKE` filtering.
 - **Interactive Watchlists** — Toggle favorites and watched states with immediate UI feedback and persistent storage.
 - **Adaptive Theming** — CSS custom properties with automatic dark/light mode detection.
