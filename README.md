@@ -413,10 +413,19 @@ MAIL_PASSWORD=your_app_password
 
 ---
 
+---
+
+*Copyright © 2026 **Filip Dziopa**. All rights reserved.*
+
+This project is part of my personal development portfolio. The source code is publicly accessible for review and evaluation purposes by recruiters and technical interviewers only. No part of this repository may be duplicated, modified, or redistributed without explicit written permission from the author.
+
+---
+
 <div align="center">
 
 **[⬆ Back to Top](#-cinemix)**
 
 Built with precision. Designed for scale.
+
 
 </div>
