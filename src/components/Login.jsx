@@ -5,6 +5,7 @@ import useAuth from "../hooks/useAuth.js";
 import config from "../config/api.js";
 import toast from "react-hot-toast";
 import StatusMessage from "./StatusMessage.jsx";
+import PasswordInput from "./PasswordInput.jsx";
 
 function Login() {
     const navigate = useNavigate();
@@ -82,7 +83,7 @@ function Login() {
                                             </div>
 
                                             <div data-mdb-input-init className="form-outline form-white mb-4">
-                                                <input type="password" id="typePasswordX" className="form-control form-control-lg" onChange={(e)=>setPassword(e.target.value)} />
+                                                <PasswordInput id="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                                                 <label className="form-label" htmlFor="typePasswordX">Password</label>
                                             </div>
 

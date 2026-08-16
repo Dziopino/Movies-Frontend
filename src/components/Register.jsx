@@ -4,6 +4,7 @@ import useAuth from "../hooks/useAuth.js";
 import {isPasswordValid} from "../utils/passwordValidator.js";
 import PasswordValidator from "./PasswordValidator.jsx";
 import config from "../config/api.js";
+import PasswordInput from "./PasswordInput.jsx";
 
 function Register() {
 
@@ -84,14 +85,15 @@ function Register() {
                                         </div>
 
                                         <div data-mdb-input-init className="form-outline form-white mb-4">
-                                            <input type="password" id="typePasswordX" className="form-control form-control-lg" onChange={(e) => setPassword(e.target.value)} />
+
+                                            <PasswordInput id={"typePasswordX"} value={password} onChange={(e) => setPassword(e.target.value)}/>
                                             <label className="form-label" htmlFor="typePasswordX">Password</label>
                                             <PasswordValidator password={password}/>
                                         </div>
 
 
                                         <div data-mdb-input-init className="form-outline form-white mb-4">
-                                            <input type="password" id="typeConfirmPassword" className="form-control form-control-lg" onChange={(e) => setConfirmPassword(e.target.value)} />
+                                            <PasswordInput id={"typeConfirmPassword"} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}/>
                                             <label className="form-label" htmlFor="typeConfirmPassword">Confirm password</label>
                                         </div>
 
