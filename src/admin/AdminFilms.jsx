@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import useDebounce from "../hooks/useDebounce.js";
-import { deleteFilm, getFilms, refreshFilm } from "../services/adminService.js";
+import { deleteFilm, getFilms, refreshFilm, addFilm } from "../services/adminService.js";
 import toast from "react-hot-toast";
 import SearchBar from "../components/SearchBar.jsx";
 import { CirclePlus, Trash, SearchX, Loader2 } from "lucide-react";
 import Pagination from "../components/Pagination.jsx";
 import AdminPasswordAuthModal from "./AdminPasswordAuthModal.jsx";
+import AddFilmModal from "./AddFilmModal.jsx";
 import useAuth from "../hooks/useAuth.js";
 import IconButton from "../components/IconButton.jsx";
 
@@ -20,6 +21,7 @@ function AdminFilms() {
     const filmsPerPage = 50;
     const [totalPages, setTotalPages] = useState(0);
     const [adminPasswordAuthModal, setAdminPasswordAuthModal] = useState(false);
+    const [addFilmModal, setAddFilmModal] = useState(false);
     const [search, setSearch] = useState("");
     const debouncedSearch = useDebounce(search, 500);
     const { userData } = useAuth();
@@ -107,7 +109,7 @@ function AdminFilms() {
                     <SearchBar setSearch={setSearch} />
                 </div>
                 <div className="d-flex gap-2">
-                    <button className="btn btn-primary d-inline-flex align-items-center">
+                    <button className="btn btn-primary d-inline-flex align-items-center" onClick={() => setAddFilmModal(true)}>
                         <CirclePlus size={18} />
                         <span className="ms-2">{t("add_film")}</span>
                     </button>
@@ -164,7 +166,10 @@ function AdminFilms() {
                                         {new Date(film.release_date).toLocaleDateString(userData.language_code)}
                                     </td>
                                     <td className="text-secondary">
-                                        {parseInt(film.duration / 60)}h {film.duration % 60}min
+                                        {film.duration >= 60
+                                            ? `${parseInt(film.duration / 60)}h ${film.duration % 60}min`
+                                            : `${film.duration}min`
+                                        }
                                     </td>
                                     <td className="text-end pe-4">
                                         <IconButton variant="danger" icon={Trash} title={t("delete_film")} onClick={() => openAction(setAdminPasswordAuthModal, film)}/>
@@ -206,7 +211,10 @@ function AdminFilms() {
                                     <div className="col-6">
                                         <span className="detail-label">{t("duration")}</span>
                                         <div className="text-light">
-                                            {parseInt(film.duration / 60)}h {film.duration % 60}min
+                                            {film.duration >= 60
+                                                ? `${parseInt(film.duration / 60)}h ${film.duration % 60}min`
+                                                : `${film.duration}min`
+                                            }
                                         </div>
                                     </div>
                                 </div>
@@ -240,6 +248,43 @@ function AdminFilms() {
                     executeAction(deleteFilm, { filmId: selectedFilm.id, password }, true);
                     setAdminPasswordAuthModal(false);
                     setSelectedFilm(null);
+                }}
+            />
+
+            <AddFilmModal
+                isOpen={addFilmModal}
+                onClose={() => setAddFilmModal(false)}
+                onConfirm={async (data) => {
+                    try {
+                        // Prepare FormData for file upload
+                        const formData = new FormData();
+
+                        // Append the poster file
+                        formData.append('poster', data.posterFile);
+
+                        // Append basic fields
+                        formData.append('rating', data.rating);
+                        formData.append('release_date', data.release_date);
+                        formData.append('duration', data.duration);
+
+                        // Append translations as JSON string
+                        formData.append('translations', JSON.stringify(data.translations));
+
+                        // Append genres as JSON string if they exist
+                        if (data.genres && data.genres.length > 0) {
+                            formData.append('genres', JSON.stringify(data.genres));
+                        }
+
+                        const response = await addFilm(formData);
+                        if (!response.success) return toast.error(t(response.message));
+
+                        toast.success(t(response.message));
+                        setAddFilmModal(false);
+                        await loadFilms();
+                    } catch (error) {
+                        toast.error(t("something_went_wrong"));
+                        console.error(error);
+                    }
                 }}
             />
         </div>

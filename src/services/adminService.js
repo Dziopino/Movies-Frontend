@@ -1,4 +1,4 @@
-import { apiRequest, postRequest } from "./apiService.js";
+import { apiRequest, postRequest, postFormDataRequest } from "./apiService.js";
 
 
 export const getUsers = (page, limit, search = "") =>{
@@ -61,8 +61,8 @@ export const deleteFilm = (data) => {
     return postRequest("deleteFilm", data);
 };
 
-export const addFilm = (data) => {
-    return postRequest("addFilm", data);
+export const addFilm = (formData) => {
+    return postFormDataRequest("addFilm", formData);
 };
 
 export const addAdmin = (data) => {

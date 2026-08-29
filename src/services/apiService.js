@@ -22,3 +22,10 @@ export const postRequest = (endpoint, data) => {
         body: JSON.stringify(data)
     });
 };
+
+export const postFormDataRequest = (endpoint, formData) => {
+    return apiRequest(endpoint, {
+        method: "POST",
+        body: formData
+    });
+};

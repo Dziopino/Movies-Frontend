@@ -203,7 +203,8 @@ Movies-Frontend/
 │   │   ├── AdminPasswordAuthModal.jsx
 │   │   ├── AdminAddAdminModal.jsx
 │   │   ├── AdminEditGenreModal.jsx
-│   │   └── AdminAddGenre.jsx
+│   │   ├── AdminAddGenre.jsx
+│   │   └── AddFilmModal.jsx    # Film creation with poster upload
 │   ├── components/             # Shared & user-facing components
 │   │   ├── Home.jsx
 │   │   ├── Film.jsx
@@ -285,6 +286,7 @@ The frontend communicates with the backend via a centralized service layer using
 | `POST` | `/editGenre` | Admin | Update genre |
 | `POST` | `/deleteGenre` | Admin | Delete genre (with password auth) |
 | `GET` | `/getFilmsAdmin` | Admin | Admin film listing |
+| `POST` | `/addFilm` | Admin | Create film with poster upload (multipart/form-data) |
 | `POST` | `/deleteFilm` | Admin | Delete film (with password auth) |
 
 > Full API documentation is available in the [Movies-Backend](https://github.com/Dziopino/Movies-Backend) repository.
@@ -296,7 +298,7 @@ The frontend communicates with the backend via a centralized service layer using
 The following features are actively planned and represent the next evolutionary phase of the Cinemix platform. Each item is designed to deepen the system's analytical capabilities, administrative oversight, and user experience resilience.
 
 ### 🎬 Content Management (Admin Film CRUD)
-- [ ] **Film Creation Pipeline** — Full admin workflow for adding new films: poster upload (WebP compression via `sharp`), metadata input, and genre assignment through a multi-select interface.
+- [x] **Film Creation Pipeline** — Full admin workflow for adding new films: poster upload with client-side resizing (200×285px) and WebP conversion, metadata input (rating, release date, duration), multi-language translation support, and genre assignment through a searchable multi-select interface with duplicate prevention.
 - [ ] **Film Editor** — Inline editing of existing film metadata (title, description, rating, release date, duration) with real-time validation.
 - [ ] **Translation Manager** — Dedicated modal for managing `film_translations`: add, edit, or remove localized titles and descriptions per language code without altering the base film record.
 - [ ] **Genre Association Engine** — Visual interface for attaching/detaching multiple genres to a film via the `film_genres` junction table, with immediate persistence and `ON DELETE CASCADE` integrity.
