@@ -160,6 +160,16 @@ const resources = {
             no_data_to_insert:"No data to insert",
             film_added_successfully:"Film added successfully",
             error_processing_poster:"Error processing poster image",
+            back_to_films:"Back to films",
+            no_description_available:"No description available",
+            loading:"Loading...",
+            change_poster:"Change Poster",
+            min:"min",
+            search_genres:"Search genres",
+            search_genres_placeholder:"Search genres...",
+            save_changes:"Save Changes",
+            saving:"Saving...",
+            cannot_remove_english_translation:"Cannot remove English translation. English is required.",
         }
     },
     pl: {
@@ -321,6 +331,16 @@ const resources = {
             no_data_to_insert:"Brak danych do wstawienia",
             film_added_successfully:"Film dodany pomyślnie",
             error_processing_poster:"Błąd podczas przetwarzania plakatu",
+            back_to_films:"Powrót do filmów",
+            no_description_available:"Brak dostępnego opisu",
+            loading:"Ładowanie...",
+            change_poster:"Zmień Plakat",
+            min:"min",
+            search_genres:"Szukaj gatunków",
+            search_genres_placeholder:"Szukaj gatunków...",
+            save_changes:"Zapisz Zmiany",
+            saving:"Zapisywanie...",
+            cannot_remove_english_translation:"Nie można usunąć angielskiego tłumaczenia. Angielski jest wymagany.",
         }
     }
 };

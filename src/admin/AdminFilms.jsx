@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import useDebounce from "../hooks/useDebounce.js";
 import { deleteFilm, getFilms, refreshFilm, addFilm } from "../services/adminService.js";
 import toast from "react-hot-toast";
@@ -13,6 +14,7 @@ import IconButton from "../components/IconButton.jsx";
 
 function AdminFilms() {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const [films, setFilms] = useState([]);
     const [filmsCount, setFilmsCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
@@ -149,7 +151,11 @@ function AdminFilms() {
                             </thead>
                             <tbody>
                             {films.map((film) => (
-                                <tr key={film.id}>
+                                <tr
+                                    key={film.id}
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => navigate(`/admin/films/${film.id}`)}
+                                >
                                     <td className="ps-4">
                                         <div className="d-flex align-items-center">
                                             <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
@@ -171,7 +177,7 @@ function AdminFilms() {
                                             : `${film.duration}min`
                                         }
                                     </td>
-                                    <td className="text-end pe-4">
+                                    <td className="text-end pe-4" onClick={(e) => e.stopPropagation()}>
                                         <IconButton variant="danger" icon={Trash} title={t("delete_film")} onClick={() => openAction(setAdminPasswordAuthModal, film)}/>
                                     </td>
                                 </tr>
@@ -185,7 +191,12 @@ function AdminFilms() {
             {!isLoading && films.length > 0 && (
                 <div className="d-lg-none mobile-users">
                     {films.map((film) => (
-                        <div className="user-card" key={film.id}>
+                        <div
+                            className="user-card"
+                            key={film.id}
+                            style={{ cursor: "pointer" }}
+                            onClick={() => navigate(`/admin/films/${film.id}`)}
+                        >
                             <div className="d-flex align-items-center mb-3">
                                 <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
                                 <div className="ms-3 flex-grow-1 min-w-0">
@@ -220,7 +231,7 @@ function AdminFilms() {
                                 </div>
                             </div>
 
-                            <div className="mt-3 pt-3 border-top border-secondary border-opacity-25">
+                            <div className="mt-3 pt-3 border-top border-secondary border-opacity-25" onClick={(e) => e.stopPropagation()}>
                                 <button
                                     className="btn btn-outline-danger btn-sm d-inline-flex align-items-center"
                                     onClick={() => openAction(setAdminPasswordAuthModal, film)}
@@ -256,28 +267,17 @@ function AdminFilms() {
                 onClose={() => setAddFilmModal(false)}
                 onConfirm={async (data) => {
                     try {
-                        // Prepare FormData for file upload
                         const formData = new FormData();
-
-                        // Append the poster file
                         formData.append('poster', data.posterFile);
-
-                        // Append basic fields
                         formData.append('rating', data.rating);
                         formData.append('release_date', data.release_date);
                         formData.append('duration', data.duration);
-
-                        // Append translations as JSON string
                         formData.append('translations', JSON.stringify(data.translations));
-
-                        // Append genres as JSON string if they exist
                         if (data.genres && data.genres.length > 0) {
                             formData.append('genres', JSON.stringify(data.genres));
                         }
-
                         const response = await addFilm(formData);
                         if (!response.success) return toast.error(t(response.message));
-
                         toast.success(t(response.message));
                         setAddFilmModal(false);
                         await loadFilms();

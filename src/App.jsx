@@ -14,6 +14,7 @@ import AdminRoute from "./admin/AdminRoute.jsx";
 import AdminLayout from "./admin/AdminLayout.jsx";
 import AdminDashboard from "./admin/AdminDashboard.jsx";
 import AdminFilms from "./admin/AdminFilms.jsx";
+import AdminFilmDetails from "./admin/AdminFilmDetails.jsx";
 import AdminUsers from "./admin/AdminUsers.jsx";
 import AdminGenres from "./admin/AdminGenres.jsx";
 
@@ -52,6 +53,7 @@ function App() {
 
                         <Route path="/admin/dashboard" element={<AdminDashboard />}/>
                         <Route path="/admin/films" element={<AdminFilms />}/>
+                        <Route path="/admin/films/:id" element={<AdminFilmDetails />}/>
                         <Route path="/admin/users" element={<AdminUsers />}/>
                         <Route path="/admin/genres" element={<AdminGenres />}/>
 
