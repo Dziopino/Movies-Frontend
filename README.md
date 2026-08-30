@@ -286,7 +286,12 @@ The frontend communicates with the backend via a centralized service layer using
 | `POST` | `/editGenre` | Admin | Update genre |
 | `POST` | `/deleteGenre` | Admin | Delete genre (with password auth) |
 | `GET` | `/getFilmsAdmin` | Admin | Admin film listing |
+| `GET` | `/getFilm/:id` | Admin | Film details for admin editor |
+| `GET` | `/getFilmTranslations/:id` | Admin | Fetch all translations for a film |
+| `GET` | `/getFilmGenres/:id` | Admin | Fetch assigned genres for a film |
+| `GET` | `/getAllGenresList` | Admin | Fetch all available genres |
 | `POST` | `/addFilm` | Admin | Create film with poster upload (multipart/form-data) |
+| `PUT` | `/updateFilm/:id` | Admin | Update film metadata, translations, genres, and poster |
 | `POST` | `/deleteFilm` | Admin | Delete film (with password auth) |
 
 > Full API documentation is available in the [Movies-Backend](https://github.com/Dziopino/Movies-Backend) repository.
@@ -299,9 +304,14 @@ The following features are actively planned and represent the next evolutionary 
 
 ### 🎬 Content Management (Admin Film CRUD)
 - [x] **Film Creation Pipeline** — Full admin workflow for adding new films: poster upload with client-side resizing (200×285px) and WebP conversion, metadata input (rating, release date, duration), multi-language translation support, and genre assignment through a searchable multi-select interface with duplicate prevention.
-- [ ] **Film Editor** — Inline editing of existing film metadata (title, description, rating, release date, duration) with real-time validation.
-- [ ] **Translation Manager** — Dedicated modal for managing `film_translations`: add, edit, or remove localized titles and descriptions per language code without altering the base film record.
-- [ ] **Genre Association Engine** — Visual interface for attaching/detaching multiple genres to a film via the `film_genres` junction table, with immediate persistence and `ON DELETE CASCADE` integrity.
+- [x] **Film Details & Editor** — Dedicated admin page (`/admin/films/:id`) displaying comprehensive film information with inline editing mode. Features include:
+  - Real-time metadata editing (rating, release date, duration, poster)
+  - Complete translation management: view all translations, edit existing ones, add new language versions, remove translations (with English protection)
+  - Genre assignment interface: searchable genre picker with instant add/remove
+  - Form validation and error handling
+  - Atomic updates via backend transactions
+- [x] **Translation Manager** — Integrated into film details page: add, edit, or remove localized titles and descriptions per language code with duplicate language prevention and mandatory English translation.
+- [x] **Genre Association Engine** — Visual interface in film editor for attaching/detaching multiple genres with live search, immediate persistence via `film_genres` junction table, and `ON DELETE CASCADE` integrity.
 
 ### 📊 Analytics & Dashboards (`/admin/dashboard`)
 - [ ] **Favorites Trend Analysis** — Time-series charts (Recharts / Chart.js) visualizing the volume of films added to favorites aggregated by month.
