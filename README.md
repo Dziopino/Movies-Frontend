@@ -191,9 +191,15 @@ Movies-Frontend/
 ├── public/                     # Static assets
 ├── src/
 │   ├── admin/                  # Admin panel module
+│   │   ├── dashboard/          # Analytics & monitoring
+│   │   │   ├── DashboardOverview.jsx
+│   │   │   ├── FilmAnalytics.jsx
+│   │   │   ├── UsersAnalytics.jsx
+│   │   │   └── AuditLogs.jsx
 │   │   ├── AdminUsers.jsx
 │   │   ├── AdminGenres.jsx
 │   │   ├── AdminFilms.jsx
+│   │   ├── AdminFilmDetails.jsx
 │   │   ├── AdminDashboard.jsx
 │   │   ├── AdminLayout.jsx
 │   │   ├── AdminRoute.jsx      # RBAC route guard
@@ -293,6 +299,10 @@ The frontend communicates with the backend via a centralized service layer using
 | `POST` | `/addFilm` | Admin | Create film with poster upload (multipart/form-data) |
 | `PUT` | `/updateFilm/:id` | Admin | Update film metadata, translations, genres, and poster |
 | `POST` | `/deleteFilm` | Admin | Delete film (with password auth) |
+| `GET` | `/api/admin/dashboard/overview` | Admin | Dashboard overview (total films, users, active users) |
+| `GET` | `/api/admin/dashboard/films-analytics` | Admin | Film analytics (top films, ratings, genre distribution) |
+| `GET` | `/api/admin/dashboard/users-analytics` | Admin | User analytics (registration trends, moderation stats) |
+| `GET` | `/api/admin/dashboard/audit-logs` | Admin | Paginated audit logs of user actions |
 
 > Full API documentation is available in the [Movies-Backend](https://github.com/Dziopino/Movies-Backend) repository.
 
@@ -314,17 +324,27 @@ The following features are actively planned and represent the next evolutionary 
 - [x] **Genre Association Engine** — Visual interface in film editor for attaching/detaching multiple genres with live search, immediate persistence via `film_genres` junction table, and `ON DELETE CASCADE` integrity.
 
 ### 📊 Analytics & Dashboards (`/admin/dashboard`)
-- [ ] **Favorites Trend Analysis** — Time-series charts (Recharts / Chart.js) visualizing the volume of films added to favorites aggregated by month.
-- [ ] **Watch-Through Metrics** — Dashboard widgets tracking total watched films, peak activity periods, and user engagement velocity.
-- [ ] **User Acquisition Tracking** — Cohort-based charts displaying new user registrations over time, with filtering by date range.
-- [ ] **Interactive Data Visualization** — Responsive, theme-aware charts that adapt to the application's dark/light mode via CSS custom properties.
+- [x] **Dashboard Overview** — Three-panel KPI dashboard displaying total films count, total users count, and active users count with visual distinction and real-time data fetching.
+- [x] **Film Analytics Panel** — Comprehensive film analytics featuring:
+  - Top 10 most popular films (horizontal bar chart comparing likes vs. watched counts)
+  - Average film rating gauge (circular progress indicator with min/max range)
+  - Recent additions metrics (films added in last week/month/year with color-coded KPI cards)
+  - Genre distribution (interactive donut chart with sorted legend from largest to smallest segment)
+- [x] **User Analytics Panel** — User behavior analytics with:
+  - 7-day registration trend (line chart showing new signups over time)
+  - Moderation statistics (banned users count, suspended users count with status indicators)
+- [x] **Audit Logs Viewer** — Paginated activity stream (50 records/page) tracking user actions on films (like/unlike/watched/unwatched) with username, action type, film title, and timestamp. Includes filter by action type and real-time refresh capability.
+- [x] **Interactive Data Visualization** — Responsive, theme-aware charts built with Recharts that adapt to the application's dark mode design system with custom tooltips and legends.
+- [ ] **Extended Time-Range Filtering** — Add date range picker for historical analysis beyond 7-day window.
+- [ ] **Export Functionality** — CSV/PDF export for analytics reports and audit logs.
 
 ### 📜 Audit Logging & Activity Stream
-- [ ] **Action Ledger** (`user_activity` table) — Immutable log of all significant platform events:
-  - Administrative: `Admin ID 1 banned User ID 3`, `Admin ID 2 promoted User ID 5`.
-  - User-facing: `User ID 4 liked Film ID 12`, `User ID 6 marked Film ID 8 as watched`.
-- [ ] **Real-Time Activity Feed** — Live-updating admin dashboard panel displaying the last N platform events with timestamps and actor attribution.
-- [ ] **Filtering & Search** — Query the audit log by actor type (admin/user), action category, and date range.
+- [x] **User Action Tracking** (`user_activity` table) — Database-backed audit log capturing user interactions with films (favorites added/removed, watched status toggled) with full attribution (user_id, film_id, action type, timestamp).
+- [x] **Activity Stream API** — `GET /api/admin/dashboard/audit-logs` endpoint with server-side pagination, action type filtering, and sorted by timestamp descending.
+- [x] **Admin Dashboard Integration** — Dedicated "Dziennik audytu" (Audit Logs) tab in admin panel displaying formatted activity feed with translated action labels and film title resolution.
+- [ ] **Administrative Action Logging** — Extend audit system to capture admin actions: user bans, suspensions, promotions, genre modifications.
+- [ ] **Advanced Filtering** — Query audit logs by specific user, film, date range, and action category with multi-criteria search.
+- [ ] **Real-Time Updates** — WebSocket integration for live activity feed updates without manual refresh.
 
 ### 🔐 Security Monitoring & Intrusion Detection
 - [ ] **Failed Authentication Tracking** — Capturing unsuccessful login attempts with IP metadata, timestamp, and targeted account.
