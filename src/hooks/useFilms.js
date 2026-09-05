@@ -7,8 +7,6 @@ import {likeFilm, watchFilm} from "../services/filmService";
 function useFilms() {
 
     const {userData} = useContext(AuthContext);
-    console.log(userData);
-
 
     const likeToggle = useCallback((filmId, reloadFilms) => {
 

@@ -17,7 +17,7 @@ function ResetPassword() {
 
 
     useEffect(() => {
-        fetch(`${config.apiUrl}/getResetToken/${token}`)
+        fetch(`${config.apiUrl}/api/getResetToken/${token}`)
             .then(res => res.json()).then((data) => {
                 setValid(data.valid);
         })
@@ -36,7 +36,7 @@ function ResetPassword() {
 
         setMessage("");
 
-        fetch(`${config.apiUrl}/resetPassword/${token}`, {
+        fetch(`${config.apiUrl}/api/resetPassword/${token}`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({password: password}),

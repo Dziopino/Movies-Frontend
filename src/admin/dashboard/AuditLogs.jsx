@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../../utils/axiosConfig';
 import { useTranslation } from 'react-i18next';
 import useDebounce from '../../hooks/useDebounce';
 import config from "../../config/api.js";
@@ -137,10 +137,10 @@ const AuditLogs = () => {
                     </h5>
                     <div className="row g-3">
                         <div className="col-lg-6">
-                            <label className="form-label text-white-50" style={{ fontSize: '14px' }}>
+                            <label htmlFor="actionFilter" className="form-label text-white-50" style={{ fontSize: '14px' }}>
                                 {t('action_type')}
                             </label>
-                            <select className="form-select" value={filters.action} onChange={(e) => handleFilterChange('action', e.target.value)} style={{backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', color: '#ffffff', borderRadius: '8px'}}>
+                            <select id="actionFilter" className="form-select" value={filters.action} onChange={(e) => handleFilterChange('action', e.target.value)} style={{backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', color: '#ffffff', borderRadius: '8px'}}>
                                 <option value="" style={{ backgroundColor: '#1a1a24', color: '#ffffff' }}>{t('all_actions')}</option>
                                 {actionTypes.map(type => (
                                     <option key={type} value={type} style={{ backgroundColor: '#1a1a24', color: '#ffffff' }}>{t(type)}</option>
@@ -148,10 +148,10 @@ const AuditLogs = () => {
                             </select>
                         </div>
                         <div className="col-lg-6">
-                            <label className="form-label text-white-50" style={{ fontSize: '14px' }}>
+                            <label htmlFor="usernameSearch" className="form-label text-white-50" style={{ fontSize: '14px' }}>
                                 {t('username')}
                             </label>
-                            <input type="text" className="form-control" placeholder={t('search_by_username')} value={filters.username} onChange={(e) => handleFilterChange('username', e.target.value)} style={{backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', color: '#ffffff', borderRadius: '8px'}}/>
+                            <input id="usernameSearch" type="text" className="form-control" placeholder={t('search_by_username')} value={filters.username} onChange={(e) => handleFilterChange('username', e.target.value)} style={{backgroundColor: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', color: '#ffffff', borderRadius: '8px'}}/>
                         </div>
                     </div>
                 </div>

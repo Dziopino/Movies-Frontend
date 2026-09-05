@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BarChart, Bar, PieChart, Pie, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import axios from '../../utils/axiosConfig';
 import config from "../../config/api.js";
 
 const FilmAnalytics = () => {

@@ -29,7 +29,7 @@ function AdminFilmDetails() {
         const fetchFilmDetails = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`${config.apiUrl}/getFilm/${id}?language=${userData.language_code}`, {
+                const response = await fetch(`${config.apiUrl}/api/getFilm/${id}?language=${userData.language_code}`, {
                     headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
                 });
                 const data = await response.json();
@@ -55,7 +55,7 @@ function AdminFilmDetails() {
     useEffect(() => {
         const fetchAllLanguages = async () => {
             try {
-                const response = await fetch(`${config.apiUrl}/getLanguageCodes`);
+                const response = await fetch(`${config.apiUrl}/api/getLanguageCodes`);
                 const data = await response.json();
                 if (data.body) {
                     setAllLanguages(data.body);
@@ -72,7 +72,7 @@ function AdminFilmDetails() {
         if (isEditMode && film) {
             const fetchAllTranslations = async () => {
                 try {
-                    const response = await fetch(`${config.apiUrl}/getFilmTranslations/${id}`, {
+                    const response = await fetch(`${config.apiUrl}/api/getFilmTranslations/${id}`, {
                         headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
                     });
                     const data = await response.json();
@@ -87,7 +87,7 @@ function AdminFilmDetails() {
 
             const fetchAllGenres = async () => {
                 try {
-                    const response = await fetch(`${config.apiUrl}/getAllGenresList`, {
+                    const response = await fetch(`${config.apiUrl}/api/getAllGenresList`, {
                         headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
                     });
                     const data = await response.json();
@@ -101,7 +101,7 @@ function AdminFilmDetails() {
 
             const fetchFilmGenres = async () => {
                 try {
-                    const response = await fetch(`${config.apiUrl}/getFilmGenres/${id}`, {
+                    const response = await fetch(`${config.apiUrl}/api/getFilmGenres/${id}`, {
                         headers: {Authorization: `Bearer ${localStorage.getItem("token")}`}
                     });
                     const data = await response.json();
@@ -153,7 +153,7 @@ function AdminFilmDetails() {
                 formData.append('genres', JSON.stringify(editedGenres.map(g => g.id)));
             }
 
-            const response = await fetch(`${config.apiUrl}/updateFilm/${id}`, {
+            const response = await fetch(`${config.apiUrl}/api/updateFilm/${id}`, {
                 method: 'PUT',
                 headers: {Authorization: `Bearer ${localStorage.getItem("token")}`},
                 body: formData
@@ -162,7 +162,7 @@ function AdminFilmDetails() {
             const data = await response.json();
 
             if (data.success) {
-                const refreshResponse = await fetch(`${config.apiUrl}/getFilm/${id}?language=${userData.language_code}`, {
+                const refreshResponse = await fetch(`${config.apiUrl}/api/getFilm/${id}?language=${userData.language_code}`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem("token")}`
                     }
@@ -257,7 +257,7 @@ function AdminFilmDetails() {
             <div className="row">
                 <div className="col-lg-4 mb-4">
                     <div className="card bg-dark border-secondary">
-                        <img src={`/${film.poster_url}`} alt={film.title} className="card-img-top" style={{ height: "auto", objectFit: "cover" }}/>
+                        <img src={`${config.apiUrl}${film.poster_url}`} alt={film.title} className="card-img-top" style={{ height: "auto", objectFit: "cover" }}/>
                         {isEditMode && (
                             <div className="card-body">
                                 <label htmlFor="poster-upload" className="form-label text-light small">{t('change_poster')}</label>

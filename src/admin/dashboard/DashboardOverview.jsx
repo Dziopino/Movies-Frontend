@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AreaChart, Area, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
+import axios from '../../utils/axiosConfig';
 import config from "../../config/api.js";
 
 const DashboardOverview = () => {
@@ -72,8 +72,16 @@ const DashboardOverview = () => {
                 setError(t('failed_to_load_dashboard_data'));
             }
         } catch (err) {
-            const errorMessage = err.response?.data?.message;
-            setError(t(errorMessage || 'server_connection_error'));
+            // Handle rate limiting errors (429) - don't show error, global alert handles it
+            if (err.isRateLimitError || err.response?.status === 429) {
+                console.warn('[Dashboard] Rate limit hit, global handler active');
+                return;
+            }
+
+            // Handle other errors
+            const errorKey = err.response?.data?.error_key;
+            const errorMessage = errorKey ? t(errorKey) : t('server_connection_error');
+            setError(errorMessage);
             console.error('Dashboard overview error:', err);
         } finally {
             setLoading(false);

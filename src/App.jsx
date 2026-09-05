@@ -1,4 +1,5 @@
 import {Routes, Route} from "react-router-dom";
+import { useEffect } from "react";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ForgotPassword from "./components/ForgotPassword.jsx";
@@ -17,12 +18,42 @@ import AdminFilms from "./admin/AdminFilms.jsx";
 import AdminFilmDetails from "./admin/AdminFilmDetails.jsx";
 import AdminUsers from "./admin/AdminUsers.jsx";
 import AdminGenres from "./admin/AdminGenres.jsx";
+import RateLimitAlert from "./components/RateLimitAlert.jsx";
+import { useError } from "./context/ErrorContext.jsx";
+import { setupAxiosInterceptor } from "./utils/axiosConfig.js";
+import { registerGlobalFetchHandler } from "./utils/globalFetchHandler.js";
 
 
 function App() {
+    const { rateLimitError, showRateLimitError, clearRateLimitError } = useError();
+
+    useEffect(() => {
+        // Setup Axios interceptor
+        setupAxiosInterceptor(showRateLimitError);
+
+        // Setup global fetch handler
+        registerGlobalFetchHandler(showRateLimitError);
+    }, [showRateLimitError]);
+
+    useEffect(() => {
+        // Auto-clear error after retryAfter time
+        if (rateLimitError) {
+            const timeout = setTimeout(() => {
+                clearRateLimitError();
+            }, rateLimitError.retryAfter * 1000);
+
+            return () => clearTimeout(timeout);
+        }
+    }, [rateLimitError, clearRateLimitError]);
 
     return (
-        <Routes>
+        <>
+            {rateLimitError && (
+                <div style={{position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, width: '90%', maxWidth: '600px'}}>
+                    <RateLimitAlert message={rateLimitError.message} retryAfter={rateLimitError.retryAfter} onDismiss={clearRateLimitError}/>
+                </div>
+            )}
+            <Routes>
 
             {/* PUBLIC */}
             <Route path="/login" element={<Login/>}/>
@@ -63,7 +94,8 @@ function App() {
 
             </Route>
 
-        </Routes>
+            </Routes>
+        </>
     );
 }
 

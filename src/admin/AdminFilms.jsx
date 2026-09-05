@@ -11,6 +11,7 @@ import AdminPasswordAuthModal from "./AdminPasswordAuthModal.jsx";
 import AddFilmModal from "./AddFilmModal.jsx";
 import useAuth from "../hooks/useAuth.js";
 import IconButton from "../components/IconButton.jsx";
+import config from "../config/api.js";
 
 function AdminFilms() {
     const { t } = useTranslation();
@@ -158,7 +159,7 @@ function AdminFilms() {
                                 >
                                     <td className="ps-4">
                                         <div className="d-flex align-items-center">
-                                            <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
+                                            <img className="admin-table-image" src={`${config.apiUrl}${film.poster_url}`} alt={t("film_poster")} loading="lazy"/>
                                             <div className="ms-3">
                                                 <div className="fw-semibold text-light" title={film.title}>
                                                     {film.title}
@@ -198,7 +199,7 @@ function AdminFilms() {
                             onClick={() => navigate(`/admin/films/${film.id}`)}
                         >
                             <div className="d-flex align-items-center mb-3">
-                                <img className="admin-table-image" src={"/" + film.poster_url} alt={t("film_poster")} loading="lazy"/>
+                                <img className="admin-table-image" src={`${config.apiUrl}${film.poster_url}`} alt={t("film_poster")} loading="lazy"/>
                                 <div className="ms-3 flex-grow-1 min-w-0">
                                     <div className="fw-semibold text-truncate text-light" title={film.title}>
                                         {film.title}

@@ -10,7 +10,7 @@ function ForgotPassword() {
 
     const onSubmit = (e) =>{
         e.preventDefault();
-        fetch(`${config.apiUrl}/requestPasswordReset`, {
+        fetch(`${config.apiUrl}/api/requestPasswordReset`, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({

@@ -24,7 +24,7 @@ function Account() {
 
 
     const getUserData = useCallback(() => {
-        fetch(`${config.apiUrl}/getUserData`,{
+        fetch(`${config.apiUrl}/api/getUserData`,{
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -49,7 +49,7 @@ function Account() {
     },[setUserData, userData.id])
 
     const getLanguageCodes = () => {
-        fetch(`${config.apiUrl}/getLanguageCodes`)
+        fetch(`${config.apiUrl}/api/getLanguageCodes`)
             .then(res => res.json()).then(data => {
             setLanguageCodes(data.body);
         })
@@ -58,7 +58,7 @@ function Account() {
     const onEditUserBio = (e) => {
         e.preventDefault();
 
-        fetch(`${config.apiUrl}/editUserBio`, {
+        fetch(`${config.apiUrl}/api/editUserBio`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json" ,
@@ -74,7 +74,7 @@ function Account() {
 
     const onEditUserName = (e) => {
         e.preventDefault();
-        fetch(`${config.apiUrl}/editUserName`, {
+        fetch(`${config.apiUrl}/api/editUserName`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -90,7 +90,7 @@ function Account() {
     const onChangeLanguage = (e) => {
         const selectedLanguageCode = e.target.value;
 
-        fetch(`${config.apiUrl}/changeUserLanguage`, {
+        fetch(`${config.apiUrl}/api/changeUserLanguage`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -117,7 +117,7 @@ function Account() {
 
     const onViewProfilePicture = () => {
         if (!userData.avatar_url){
-            window.open(`/guest.webp`, "_blank");
+            window.open(`${config.apiUrl}/uploads/posters/guest.webp`, "_blank");
             return;
         }
 
@@ -146,7 +146,7 @@ function Account() {
         const formData = new FormData();
         formData.append("avatar", file);
 
-        fetch(`${config.apiUrl}/uploadAvatar`, {
+        fetch(`${config.apiUrl}/api/uploadAvatar`, {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
@@ -184,7 +184,7 @@ function Account() {
                 <div className="col-md-4 mb-4 mb-md-0 d-flex justify-content-center">
                     <div className="bg-dark rounded shadow-lg overflow-hidden w-100 text-center p-3">
 
-                        <img src={userData.avatar_url === null ? "/guest.webp" : `${config.apiUrl}${userData.avatar_url}`} alt="user avatar" className="img-fluid rounded-circle" style={{ width: "180px", height: "180px", objectFit: "cover", cursor: "pointer" }} onClick={onSetEditProfilePictureToggler}/>
+                        <img src={userData.avatar_url === null ? `${config.apiUrl}/uploads/posters/guest.webp` : `${config.apiUrl}${userData.avatar_url}`} alt="user avatar" className="img-fluid rounded-circle" style={{ width: "180px", height: "180px", objectFit: "cover", cursor: "pointer" }} onClick={onSetEditProfilePictureToggler}/>
 
                         {isProfilePictureEditionActive && (
                             <div className="d-flex flex-column gap-2 mt-3">
@@ -256,7 +256,7 @@ function Account() {
                             <label className="text-white" htmlFor="language-select">{t("choose_your_language")}</label>
 
                             <select id="language-select" className="form-select" value={userData.language_code || ""} onChange={onChangeLanguage}>
-                                {languageCodes.map((language) => (
+                                {languageCodes?.map((language) => (
                                     <option key={language.code} value={language.code}>{language.name}</option>
                                 ))}
                             </select>

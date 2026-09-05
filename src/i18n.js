@@ -170,8 +170,6 @@ const resources = {
             save_changes:"Save Changes",
             saving:"Saving...",
             cannot_remove_english_translation:"Cannot remove English translation. English is required.",
-
-            // Audit Logs
             audit_logs: "Audit Logs",
             filters: "Filters",
             action_type: "Action Type",
@@ -186,8 +184,6 @@ const resources = {
             of: "of",
             previous: "Previous",
             next: "Next",
-
-            // Action types (uppercase for audit logs)
             FILM_LIKED: "Film Liked",
             FILM_UNLIKED: "Film Unliked",
             FILM_WATCHED: "Film Watched",
@@ -213,8 +209,6 @@ const resources = {
             FILM_CREATED: "Film Created",
             FILM_UPDATED: "Film Updated",
             FILM_DELETED: "Film Deleted",
-
-            // Action types (lowercase for pie chart)
             user_logged_in: "User Logins",
             user_registered: "User Registrations",
             film_liked: "Films Liked",
@@ -238,8 +232,6 @@ const resources = {
             film_deleted: "Films Deleted",
             film_created: "Films Created",
             film_updated: "Films Updated",
-
-            // Dashboard Overview
             admin_dashboard: "Admin Dashboard",
             overview: "Overview",
             users_analytics: "Users Analytics",
@@ -252,8 +244,6 @@ const resources = {
             top_actions: "Top Actions",
             failed_to_load_dashboard_data: "Failed to load dashboard data",
             value: "Value",
-
-            // Films Analytics
             failed_to_load_films_analytics: "Failed to load films analytics",
             films_added_last_week: "Films Added Last Week",
             films_added_last_month: "Films Added Last Month",
@@ -265,8 +255,6 @@ const resources = {
             top_popular_films: "Top 10 Most Popular Films",
             likes: "Likes",
             no_data_available: "No data available",
-
-            // Users Analytics
             total_banned_users: "Total Banned Users",
             total_suspended_users: "Total Suspended Users",
             permanent_action: "Permanent Action",
@@ -276,6 +264,10 @@ const resources = {
             last_7_days: "Last 7 Days",
             registrations: "Registrations",
             failed_to_load_users_analytics: "Failed to load users analytics",
+            "error.rate_limit_exceeded": "Too many requests detected from your IP address. Access has been temporarily restricted for security reasons. Please try again in 15 minutes.",
+            "error.auth_rate_limit_exceeded": "Too many login attempts detected. For security reasons, access has been temporarily blocked. Please try again in 15 minutes.",
+            rate_limit_exceeded_title: "Rate Limit Exceeded",
+            retry_after: "Retry after",
         }
     },
     pl: {
@@ -447,8 +439,6 @@ const resources = {
             save_changes:"Zapisz Zmiany",
             saving:"Zapisywanie...",
             cannot_remove_english_translation:"Nie można usunąć angielskiego tłumaczenia. Angielski jest wymagany.",
-
-            // Audit Logs
             audit_logs: "Dziennik audytu",
             filters: "Filtry",
             action_type: "Typ akcji",
@@ -463,8 +453,6 @@ const resources = {
             of: "z",
             previous: "Poprzednia",
             next: "Następna",
-
-            // Action types (uppercase for audit logs)
             FILM_LIKED: "Film polubiony",
             FILM_UNLIKED: "Film odpolubiony",
             FILM_WATCHED: "Film obejrzany",
@@ -490,8 +478,6 @@ const resources = {
             FILM_CREATED: "Film utworzony",
             FILM_UPDATED: "Film zaktualizowany",
             FILM_DELETED: "Film usunięty",
-
-            // Action types (lowercase for pie chart)
             user_logged_in: "Logowania użytkowników",
             user_registered: "Rejestracje użytkowników",
             film_liked: "Polubione filmy",
@@ -515,8 +501,6 @@ const resources = {
             film_deleted: "Usunięte filmy",
             film_created: "Utworzone filmy",
             film_updated: "Zaktualizowane filmy",
-
-            // Dashboard Overview
             admin_dashboard: "Panel administracyjny",
             overview: "Przegląd",
             users_analytics: "Analityka użytkowników",
@@ -529,8 +513,6 @@ const resources = {
             top_actions: "Najczęstsze akcje",
             failed_to_load_dashboard_data: "Nie udało się załadować danych pulpitu",
             value: "Wartość",
-
-            // Films Analytics
             failed_to_load_films_analytics: "Nie udało się załadować analityki filmów",
             films_added_last_week: "Filmy dodane w ostatnim tygodniu",
             films_added_last_month: "Filmy dodane w ostatnim miesiącu",
@@ -542,8 +524,6 @@ const resources = {
             top_popular_films: "Top 10 najpopularniejszych filmów",
             likes: "Polubienia",
             no_data_available: "Brak danych",
-
-            // Users Analytics
             total_banned_users: "Zablokowani użytkownicy",
             total_suspended_users: "Zawieszeni użytkownicy",
             permanent_action: "Akcja stała",
@@ -553,6 +533,10 @@ const resources = {
             last_7_days: "Ostatnie 7 dni",
             registrations: "Rejestracje",
             failed_to_load_users_analytics: "Nie udało się załadować analityki użytkowników",
+            "error.rate_limit_exceeded": "Wykryto zbyt wiele żądań z Twojego adresu IP. Ze względów bezpieczeństwa dostęp został tymczasowo zablokowany. Spróbuj ponownie za 15 minut.",
+            "error.auth_rate_limit_exceeded": "Wykryto zbyt wiele prób logowania. Ze względów bezpieczeństwa dostęp został tymczasowo zablokowany. Spróbuj ponownie za 15 minut.",
+            rate_limit_exceeded_title: "Przekroczono limit żądań",
+            retry_after: "Spróbuj ponownie za",
         }
     }
 };

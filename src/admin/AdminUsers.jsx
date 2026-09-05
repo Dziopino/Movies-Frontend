@@ -92,7 +92,7 @@ function AdminUsers() {
     };
 
     const checkSuspensions = () => {
-        fetch(`${config.apiUrl}/checkSuspensions`, {
+        fetch(`${config.apiUrl}/api/checkSuspensions`, {
             method: "POST",
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         })

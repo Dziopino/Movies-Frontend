@@ -35,7 +35,7 @@ function Favorites()  {
 
     const reloadFilms = useCallback(() =>{
 
-        fetch(`${config.apiUrl}/likedGet`,{
+        fetch(`${config.apiUrl}/api/likedGet`,{
             method:"POST",
             headers:{
                 "Content-Type":"application/json",
@@ -88,7 +88,7 @@ function Favorites()  {
                         <div className="col" key={favorite.id}>
                             <div className="card h-100 bg-dark d-flex flex-column">
 
-                                <img loading="lazy" src={favorite.poster_url} className="card-img-top" alt="Movie Image" onClick={()=>(navigate(`/film/${favorite.id}`))}/>
+                                <img loading="lazy" src={`${config.apiUrl}${favorite.poster_url}`} className="card-img-top" alt="Movie Image" onClick={()=>(navigate(`/film/${favorite.id}`))}/>
 
                                 <div className="card-body" onClick={()=>(navigate(`/film/${favorite.id}`))}>
                                     <h2 className="card-title text-white" style={{fontSize:"1.25rem"}}>{favorite.title}</h2>

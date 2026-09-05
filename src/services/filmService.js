@@ -2,7 +2,7 @@ import config from "../config/api.js";
 
 export function likeFilm(filmId) {
 
-    return fetch(`${config.apiUrl}/likeToggle`, {
+    return fetch(`${config.apiUrl}/api/likeToggle`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -19,7 +19,7 @@ export function likeFilm(filmId) {
 
 export function watchFilm(filmId) {
 
-    return fetch(`${config.apiUrl}/watchedToggle`, {
+    return fetch(`${config.apiUrl}/api/watchedToggle`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

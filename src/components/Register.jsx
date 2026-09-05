@@ -31,7 +31,7 @@ function Register() {
 
         setMessage("");
 
-        fetch(`${config.apiUrl}/addUser`, {
+        fetch(`${config.apiUrl}/api/addUser`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({username, email, password})

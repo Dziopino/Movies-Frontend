@@ -15,7 +15,7 @@ function Film() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilm = () => {
-        fetch(`${config.apiUrl}/getFilm/${id}?language=${userData.language_code}`,{
+        fetch(`${config.apiUrl}/api/getFilm/${id}?language=${userData.language_code}`,{
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
@@ -42,7 +42,7 @@ function Film() {
 
                 <div className="col-md-4 mb-4 mb-md-0 d-flex justify-content-center">
                     <div className="bg-dark rounded shadow-lg overflow-hidden" style={{ width: "100%" }}>
-                        <img src={`/${film.poster_url}`} alt={film.title} className="img-fluid w-100" style={{ objectFit: "cover" }}/>
+                        <img src={`${config.apiUrl}${film.poster_url}`} alt={film.title} className="img-fluid w-100" style={{ objectFit: "cover" }}/>
                     </div>
                 </div>
 

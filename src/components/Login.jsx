@@ -25,7 +25,7 @@ function Login() {
             return;
         }
 
-        fetch(`${config.apiUrl}/checkLoginData`, {
+        fetch(`${config.apiUrl}/api/checkLoginData`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({email, password}),
@@ -83,7 +83,7 @@ function Login() {
                                             </div>
 
                                             <div data-mdb-input-init className="form-outline form-white mb-4">
-                                                <PasswordInput id="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                                                <PasswordInput id="typePasswordX" value={password} onChange={(e) => setPassword(e.target.value)}/>
                                                 <label className="form-label" htmlFor="typePasswordX">Password</label>
                                             </div>
 

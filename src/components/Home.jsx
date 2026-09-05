@@ -35,7 +35,7 @@ function Home() {
 
     const reloadFilms = () => {
 
-        fetch(`${config.apiUrl}/getFilms`, {
+        fetch(`${config.apiUrl}/api/getFilms`, {
             method:"POST",
             headers:{
                 "Content-Type":"application/json",
@@ -112,11 +112,11 @@ function Home() {
 
                 <div className="row  row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-4 g-5">
 
-                    {films.map((film) => (
+                    {films?.map((film) => (
                         <div className="col" key={film.id}>
                             <div className="card h-100 bg-dark d-flex flex-column">
 
-                                <img loading="lazy" src={film.poster_url} className="card-img-top" alt="Movie Image" onClick={() => navigate(`/film/${film.id}`)}/>
+                                <img loading="lazy" src={`${config.apiUrl}${film.poster_url}`} className="card-img-top" alt="Movie Image" onClick={() => navigate(`/film/${film.id}`)}/>
 
                                 <div className="card-body" onClick={() => navigate(`/film/${film.id}`)}>
                                     <h2 className="card-title text-white" style={{fontSize:"1.25rem"}}>{film.title}</h2>

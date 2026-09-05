@@ -1,8 +1,10 @@
 import config from "../config/api.js";
 
 export async function apiRequest(endpoint, options = {}) {
+    // Add /api prefix if not already present
+    const normalizedEndpoint = endpoint.startsWith('/api/') ? endpoint : `/api/${endpoint.replace(/^\//, '')}`;
 
-    const response = await fetch(`${config.apiUrl}/${endpoint}`, {
+    const response = await fetch(`${config.apiUrl}${normalizedEndpoint}`, {
         ...options,
         headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,

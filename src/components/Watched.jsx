@@ -37,7 +37,7 @@ function Watched() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     const reloadFilms = useCallback(() =>{
 
-        fetch(`${config.apiUrl}/watchedGet`,{
+        fetch(`${config.apiUrl}/api/watchedGet`,{
             method:"POST",
             headers:{
                 "Content-Type":"application/json",
@@ -89,7 +89,7 @@ function Watched() {
                         <div className="col" key={watched.id}>
                             <div className="card h-100 bg-dark d-flex flex-column">
 
-                                <img loading="lazy" src={watched.poster_url} className="card-img-top" alt="Movie Image" onClick={() => navigate(`/film/${watched.id}`)}/>
+                                <img loading="lazy" src={`${config.apiUrl}${watched.poster_url}`} className="card-img-top" alt="Movie Image" onClick={() => navigate(`/film/${watched.id}`)}/>
 
                                 <div className="card-body" onClick={() => navigate(`/film/${watched.id}`)} >
                                     <h2 className="card-title text-white" style={{fontSize:"1.25rem"}}>{watched.title}</h2>
