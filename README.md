@@ -188,7 +188,7 @@ Movies-Frontend/
 │   ├── home-en.png
 │   ├── home-pl.png
 │   └── register.png
-├── public/                     # Static assets
+├── public/                     # Static assets (posters moved to backend)
 ├── src/
 │   ├── admin/                  # Admin panel module
 │   │   ├── dashboard/          # Analytics & monitoring
@@ -221,6 +221,7 @@ Movies-Frontend/
 │   │   ├── Account.jsx
 │   │   ├── ForgotPassword.jsx
 │   │   ├── ResetPassword.jsx
+│   │   ├── RateLimitAlert.jsx  # 429 error modal with countdown
 │   │   ├── Header.jsx
 │   │   ├── Footer.jsx
 │   │   ├── SearchBar.jsx
@@ -240,6 +241,7 @@ Movies-Frontend/
 │   │   └── api.js
 │   ├── context/                # Global state containers
 │   │   ├── AuthContext.jsx
+│   │   ├── ErrorContext.jsx    # Rate limit error handling
 │   │   ├── FilmContext.jsx
 │   │   └── WarningContext.jsx
 │   ├── hooks/                  # Reusable logic abstractions
@@ -255,6 +257,9 @@ Movies-Frontend/
 │   │   ├── filmService.js
 │   │   └── userService.js
 │   ├── utils/                  # Helper utilities
+│   │   ├── axiosConfig.js      # Axios interceptor configuration
+│   │   ├── fetchWrapper.js     # Fetch API wrapper
+│   │   ├── globalFetchHandler.js # Global rate limit handler
 │   │   └── passwordValidator.js
 │   ├── App.jsx                 # Application routing
 │   ├── i18n.js                 # i18next configuration
@@ -378,7 +383,7 @@ npm install
 
 # Configure API endpoint
 # Edit src/config/api.js:
-# export default { apiUrl: "http://localhost:3000" };
+# export default { apiUrl: "http://localhost:8000" };
 
 # Start development server
 npm run dev
@@ -401,14 +406,26 @@ Static output is generated in the `dist/` directory.
 The frontend relies on the backend's environment configuration. Ensure the backend `.env` is properly set:
 
 ```env
-PORT=3000
+PORT=8000
+NODE_ENV=development
+
+# Database
 DB_HOST=localhost
 DB_USER=root
 DB_PASSWORD=your_password
-DB_NAME=your_db_name
-JWT_SECRET=your_jwt_secret
+DB_NAME=cinemix
+DB_PORT=3306
+
+# Security
+JWT_SECRET=your_64_byte_hex_secret
+
+# Email (Gmail SMTP)
 MAIL_USER=your_email@gmail.com
 MAIL_PASSWORD=your_app_password
+
+# CORS
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGIN=http://localhost:5173
 ```
 
 ---
