@@ -57,14 +57,13 @@ function AdminAddAdminModal({isOpen, onClose, onConfirm}) {
                     {t("username")}
                 </label>
 
-                <input id="username" type="text" className="form-control mt-2" value={username} onChange={(e)=>setUsername(e.target.value)}/>
+                <input autoComplete="off" id="username" type="text" className="form-control mt-2" value={username} onChange={(e)=>setUsername(e.target.value)}/>
 
                 <label className="mt-3" htmlFor="email">
                     {t("email")}
                 </label>
 
-                <input id="email" type="email" className="form-control mt-2" value={email} onChange={(e)=>setEmail(e.target.value)}
-                />
+                <input autoComplete="off" id="email" type="email" className="form-control mt-2" value={email} onChange={(e)=>setEmail(e.target.value)}/>
 
 
                 <label className="mt-3" htmlFor="password">
