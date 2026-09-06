@@ -4,7 +4,7 @@
 
 ### Full-Stack Movie Catalog & Management Platform
 
-Cinemix is a full-stack web application for browsing, searching and managing a movie catalog. 
+Cinemix is a full-stack web application for browsing, searching and managing a movie catalog.
 Users can create accounts, manage favorites and watched movies, customize their profiles and use the application in multiple languages.
 
 The platform also includes a protected administration panel for managing users, genres and movie data.
@@ -17,7 +17,7 @@ The platform also includes a protected administration panel for managing users, 
 
 **React 19 · Vite · REST API · RBAC · i18n · Server-Side Pagination**
 
-[Frontend Repo](https://github.com/Dziopino/Movies-Frontend) · [Backend Repo](https://github.com/Dziopino/Movies-Backend) · [Live Demo (Coming Soon)](#) · [Screenshots](#-screenshots)
+[Frontend Repo](https://github.com/Dziopino/Movies-Frontend) · [Backend Repo](https://github.com/Dziopino/Movies-Backend) · [Live Demo](https://cinemix.xyz) · [Screenshots](#-screenshots)
 
 </div>
 
@@ -320,24 +320,24 @@ The following features are actively planned and represent the next evolutionary 
 ### 🎬 Content Management (Admin Film CRUD)
 - [x] **Film Creation Pipeline** — Full admin workflow for adding new films: poster upload with client-side resizing (200×285px) and WebP conversion, metadata input (rating, release date, duration), multi-language translation support, and genre assignment through a searchable multi-select interface with duplicate prevention.
 - [x] **Film Details & Editor** — Dedicated admin page (`/admin/films/:id`) displaying comprehensive film information with inline editing mode. Features include:
-  - Real-time metadata editing (rating, release date, duration, poster)
-  - Complete translation management: view all translations, edit existing ones, add new language versions, remove translations (with English protection)
-  - Genre assignment interface: searchable genre picker with instant add/remove
-  - Form validation and error handling
-  - Atomic updates via backend transactions
+    - Real-time metadata editing (rating, release date, duration, poster)
+    - Complete translation management: view all translations, edit existing ones, add new language versions, remove translations (with English protection)
+    - Genre assignment interface: searchable genre picker with instant add/remove
+    - Form validation and error handling
+    - Atomic updates via backend transactions
 - [x] **Translation Manager** — Integrated into film details page: add, edit, or remove localized titles and descriptions per language code with duplicate language prevention and mandatory English translation.
 - [x] **Genre Association Engine** — Visual interface in film editor for attaching/detaching multiple genres with live search, immediate persistence via `film_genres` junction table, and `ON DELETE CASCADE` integrity.
 
 ### 📊 Analytics & Dashboards (`/admin/dashboard`)
 - [x] **Dashboard Overview** — Three-panel KPI dashboard displaying total films count, total users count, and active users count with visual distinction and real-time data fetching.
 - [x] **Film Analytics Panel** — Comprehensive film analytics featuring:
-  - Top 10 most popular films (horizontal bar chart comparing likes vs. watched counts)
-  - Average film rating gauge (circular progress indicator with min/max range)
-  - Recent additions metrics (films added in last week/month/year with color-coded KPI cards)
-  - Genre distribution (interactive donut chart with sorted legend from largest to smallest segment)
+    - Top 10 most popular films (horizontal bar chart comparing likes vs. watched counts)
+    - Average film rating gauge (circular progress indicator with min/max range)
+    - Recent additions metrics (films added in last week/month/year with color-coded KPI cards)
+    - Genre distribution (interactive donut chart with sorted legend from largest to smallest segment)
 - [x] **User Analytics Panel** — User behavior analytics with:
-  - 7-day registration trend (line chart showing new signups over time)
-  - Moderation statistics (banned users count, suspended users count with status indicators)
+    - 7-day registration trend (line chart showing new signups over time)
+    - Moderation statistics (banned users count, suspended users count with status indicators)
 - [x] **Audit Logs Viewer** — Paginated activity stream (50 records/page) tracking user actions on films (like/unlike/watched/unwatched) with username, action type, film title, and timestamp. Includes filter by action type and real-time refresh capability.
 - [x] **Interactive Data Visualization** — Responsive, theme-aware charts built with Recharts that adapt to the application's dark mode design system with custom tooltips and legends.
 - [ ] **Extended Time-Range Filtering** — Add date range picker for historical analysis beyond 7-day window.
@@ -444,7 +444,7 @@ CORS_ORIGIN=http://localhost:5173
     <td><img src="docs/home-en.png" width="100%"></td>
     <td><img src="docs/home-pl.png" width="100%"></td>
   </tr>
-  
+
   <!-- Wiersz 2: Panel Admina i Mobile -->
   <tr>
     <td colspan="2"><b>4. Admin Panel (User Management)</b></td>
