@@ -1,4 +1,4 @@
-import {NavLink, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
 import PasswordValidator from "./PasswordValidator.jsx";
 import { isPasswordValid } from "../utils/passwordValidator.js";
@@ -98,23 +98,6 @@ function ResetPassword() {
 
                                             </form>
                                         </div>
-                                            <div className="py-4">
-
-                                                <div className="mb-4">
-                                                    <i className="bi bi-exclamation-triangle-fill text-warning" style={{fontSize:"60px"}}></i>
-                                                </div>
-
-                                                <h2 className="fw-bold mb-3">
-                                                    Link expired
-                                                </h2>
-
-                                                <p className="text-white-50 mb-4">
-                                                    This password reset link has expired or is no longer valid. Please request a new password reset link.
-                                                </p>
-
-                                                <NavLink to="/forgotPassword" className="btn btn-outline-light btn-lg px-5">Request new link</NavLink>
-                                            </div>
-
                                 </div>
                             </div>
                         </div>
@@ -122,13 +105,7 @@ function ResetPassword() {
                 </div>
             </section>
             ):(
-                <StatusMessage
-                    icon="bi bi-exclamation-triangle-fill"
-                    title="Link expired"
-                    message="This password reset link has expired or is no longer valid. Please request a new password reset link."
-                    buttonText="Request new link"
-                    buttonLink="/forgotPassword"
-                />
+                <StatusMessage icon="bi bi-exclamation-triangle-fill" title="Link expired" message="This password reset link has expired or is no longer valid. Please request a new password reset link." buttonText="Request new link" buttonLink="/forgotPassword"/>
             )}
         </>
     )
