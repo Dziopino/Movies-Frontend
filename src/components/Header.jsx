@@ -10,22 +10,18 @@ function Header() {
     return (
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-4">
-                <div className="ms-auto d-flex align-items-center gap-3">
+                <BackButton />
 
-                    <BackButton />
-
-                    <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"  aria-label="Open navbar">
-                        <span className="navbar-toggler-icon"></span>
-                    </button>
-
-                </div>
+                <button className="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"  aria-label="Open navbar">
+                    <span className="navbar-toggler-icon"></span>
+                </button>
 
 
 
                 <div className="collapse navbar-collapse" id="navbarNav">
 
 
-                    <ul className="navbar-nav ms-5">
+                    <ul className="navbar-nav">
 
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/">
@@ -56,7 +52,6 @@ function Header() {
 
                     <div className="ms-auto d-flex align-items-center gap-3 ">
 
-                        <BackButton />
                         {userData.role === 1 && (
                             <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/admin/dashboard");}}>{t("admin_panel")}</button>
                         )}

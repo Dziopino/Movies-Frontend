@@ -1,4 +1,3 @@
-import BackButton from "../components/BackButton.jsx";
 import {NavLink, useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
@@ -11,8 +10,6 @@ function AdminHeader() {
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-4">
                 <div className="ms-auto d-flex align-items-center gap-3">
-
-                    <BackButton />
 
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"  aria-label="Open navbar">
                         <span className="navbar-toggler-icon"></span>
@@ -56,7 +53,6 @@ function AdminHeader() {
 
                     <div className="ms-auto d-flex align-items-center gap-3 ">
 
-                        <BackButton />
                             <button className="btn btn-outline-light" type="button" onClick={()=> {navigate("/");}}>{t("home")}</button>
 
 

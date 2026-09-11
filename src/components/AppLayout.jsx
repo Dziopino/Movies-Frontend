@@ -11,7 +11,7 @@ function AppLayout()  {
 
             <BackButton />
 
-            <main style={{ display: "flex", flexGrow: 1 }}>
+            <main style={{ display: "flex", flexGrow: 1, width: "100%", justifyContent: "center" }}>
                 <Outlet />
             </main>
 

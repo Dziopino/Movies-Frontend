@@ -76,6 +76,9 @@ The platform serves two distinct user personas:
 | **i18next + react-i18next** | Comprehensive internationalization engine (PL/EN) |
 | **react-hot-toast** | Non-blocking toast notification system |
 | **Lucide React** | Consistent, lightweight iconography |
+| **axios** | HTTP client for API communication |
+| **react-icons** | Extended icon library |
+| **Recharts** | Interactive, responsive data visualization for admin dashboards |
 
 ### Backend (Companion Repo)
 | Technology | Purpose |
@@ -84,8 +87,10 @@ The platform serves two distinct user personas:
 | **MySQL** | Relational database with foreign key constraints and CASCADE behaviors |
 | **JWT (jsonwebtoken)** | Stateless authentication |
 | **bcrypt** | Secure password hashing |
-| **multer + sharp** | Image upload pipeline with WebP compression (300×300, max 2MB) |
-| **nodemailer** | Transactional email delivery (password reset flow) |
+| **multer + sharp** | Image upload pipeline with WebP compression (300×300 avatars, 200×285 posters, max 2MB) |
+| **Resend** | HTTPS-based transactional email API (password reset flow) |
+| **helmet** | HTTP security headers (CSP, HSTS, X-Frame-Options) |
+| **express-rate-limit** | Rate limiting (global: 750 req/15min, auth: 10 req/15min) |
 
 ---
 
@@ -134,6 +139,8 @@ The platform serves two distinct user personas:
 - **Interactive Watchlists** — Toggle favorites and watched states with immediate UI feedback and persistent storage.
 - **Adaptive Theming** — CSS custom properties with automatic dark/light mode detection.
 - **Responsive Layout** — Dual-view architecture: data tables for desktop (`lg` breakpoint), card-based layouts for mobile.
+- **User Profiles** — Customizable biography, display name, avatar upload (300×300 WebP), and language preference (PL/EN).
+- **Password Reset** — Token-based email flow via Resend API (15-min expiry, HTTPS delivery).
 
 ### Administrative Capabilities
 - **Granular RBAC** — Distinct `User` (role: 0) and `Admin` (role: 1) roles with middleware-enforced route protection.
@@ -142,6 +149,8 @@ The platform serves two distinct user personas:
 - **Genre CRUD** — Full create/read/update/delete with uniqueness constraints and `ON DELETE CASCADE` integrity.
 - **Sensitive Action Verification** — Critical operations (promote, delete genre/film) require re-authentication via administrator password confirmation modal.
 - **Batch Suspension Check** — Admin endpoint to mass-reconcile expired suspensions across the user base.
+- **Film Management** — Create, edit, and delete films with poster upload (200×285 WebP), multi-language translations, and genre associations.
+- **Analytics Dashboard** — Real-time KPIs, film popularity charts, user registration trends, and audit logs.
 
 ---
 
@@ -175,6 +184,18 @@ Administrative tables utilize Bootstrap's display utilities (`d-none d-lg-block`
 
 ### 8. Database Integrity
 Relies on foreign key constraints, unique composite indexes (e.g., `user_id` + `film_id` in favorites), and `ON DELETE CASCADE` on junction tables to maintain referential integrity without manual cleanup logic.
+
+### 9. Image Processing Pipeline
+Backend handles image uploads via `multer` + `sharp`: automatic WebP conversion, 300×300px (avatars) / 200×285px (posters) resize, 2MB size limit, with secure filename generation and MIME type validation. Old avatars are deleted on replacement.
+
+### 10. Rate Limiting & Security
+Express rate limiting middleware protects authentication endpoints against brute-force attacks (10 req/15min). Global limiter at 750 req/15min. Helmet.js provides HTTP security headers (CSP, HSTS, X-Frame-Options). CORS configuration restricts origins to the frontend domain.
+
+### 11. Activity Logging & Audit Trail
+Comprehensive `user_activity` table tracks all user actions (favorites, watched, profile updates, login) and admin actions (bans, suspensions, promotions, genre/film CRUD). Admin dashboard includes paginated audit logs with filtering by action type and username.
+
+### 12. Localized Response Architecture
+The backend returns i18n **message keys** (e.g., `user_banned_successfully`, `database_error`) rather than hardcoded English strings. The React frontend translates these keys via `react-i18next`, enabling seamless multi-language support without backend redeployment.
 
 ---
 
@@ -260,8 +281,11 @@ Movies-Frontend/
 │   │   ├── axiosConfig.js      # Axios interceptor configuration
 │   │   ├── fetchWrapper.js     # Fetch API wrapper
 │   │   ├── globalFetchHandler.js # Global rate limit handler
+│   │   ├── globalErrorHandler.js # Global error handling
 │   │   └── passwordValidator.js
 │   ├── App.jsx                 # Application routing
+│   ├── AppLayout.jsx           # Main layout wrapper
+│   ├── ProtectedRoutes.jsx     # Auth route guards
 │   ├── i18n.js                 # i18next configuration
 │   ├── index.css               # Global styles & CSS variables
 │   └── main.jsx                # Entry point
@@ -280,31 +304,46 @@ The frontend communicates with the backend via a centralized service layer using
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
-| `POST` | `/checkLoginData` | — | Authenticate user, return JWT |
-| `POST` | `/addUser` | — | Register new account |
-| `POST` | `/getFilms` | Optional | Paginated film catalog with search |
-| `GET` | `/getFilm/:id` | Optional | Film details with genres & user states |
-| `POST` | `/likeToggle` | JWT | Add/remove favorite |
-| `POST` | `/watchedToggle` | JWT | Toggle watched status |
-| `POST` | `/likedGet` | JWT | Paginated favorites list |
-| `POST` | `/watchedGet` | JWT | Paginated watched list |
-| `GET` | `/getUsers` | Admin | User management data |
-| `POST` | `/banUser` | Admin | Ban user account |
-| `POST` | `/suspendUser` | Admin | Suspend user account |
-| `POST` | `/promoteUser` | Admin | Elevate user to admin |
-| `GET` | `/getGenres` | Admin | Genre management data |
-| `POST` | `/addGenre` | Admin | Create genre |
-| `POST` | `/editGenre` | Admin | Update genre |
-| `POST` | `/deleteGenre` | Admin | Delete genre (with password auth) |
-| `GET` | `/getFilmsAdmin` | Admin | Admin film listing |
-| `GET` | `/getFilm/:id` | Admin | Film details for admin editor |
-| `GET` | `/getFilmTranslations/:id` | Admin | Fetch all translations for a film |
-| `GET` | `/getFilmGenres/:id` | Admin | Fetch assigned genres for a film |
-| `GET` | `/getAllGenresList` | Admin | Fetch all available genres |
-| `POST` | `/addFilm` | Admin | Create film with poster upload (multipart/form-data) |
-| `PUT` | `/updateFilm/:id` | Admin | Update film metadata, translations, genres, and poster |
-| `POST` | `/deleteFilm` | Admin | Delete film (with password auth) |
-| `GET` | `/api/admin/dashboard/overview` | Admin | Dashboard overview (total films, users, active users) |
+| `POST` | `/api/checkLoginData` | — | Authenticate user, return JWT |
+| `POST` | `/api/addUser` | — | Register new account |
+| `POST` | `/api/requestPasswordReset` | — | Request password reset email |
+| `GET` | `/api/getResetToken/:token` | — | Verify reset token |
+| `POST` | `/api/resetPassword/:token` | — | Reset password with token |
+| `POST` | `/api/getFilms` | Optional | Paginated film catalog with search |
+| `GET` | `/api/getFilm/:id` | Optional | Film details with genres & user states |
+| `GET` | `/api/getLanguageCodes` | — | Get supported language codes |
+| `POST` | `/api/likeToggle` | JWT | Add/remove favorite |
+| `POST` | `/api/watchedToggle` | JWT | Toggle watched status |
+| `POST` | `/api/likedGet` | JWT | Paginated favorites list |
+| `POST` | `/api/watchedGet` | JWT | Paginated watched list |
+| `POST` | `/api/getUserData` | JWT | Get user profile data |
+| `POST` | `/api/getUserActivity` | JWT | Get user's activity history |
+| `POST` | `/api/editUserBio` | JWT | Update user biography |
+| `POST` | `/api/editUserName` | JWT | Update display name |
+| `POST` | `/api/changeUserLanguage` | JWT | Update preferred locale |
+| `POST` | `/api/uploadAvatar` | JWT | Upload profile picture |
+| `GET` | `/api/getUsers` | Admin | User management data |
+| `GET` | `/api/refreshUser/:userId` | Admin | Refresh user data |
+| `POST` | `/api/banUser` | Admin | Ban user account |
+| `POST` | `/api/unBanUser` | Admin | Unban user account |
+| `POST` | `/api/suspendUser` | Admin | Suspend user account |
+| `POST` | `/api/unSuspendUser` | Admin | Unsuspend user account |
+| `POST` | `/api/promoteUser` | Admin | Elevate user to admin |
+| `POST` | `/api/checkSuspensions` | Admin | Batch check expired suspensions |
+| `POST` | `/api/addAdmin` | Admin | Create new admin account |
+| `GET` | `/api/getGenres` | Admin | Genre management data |
+| `GET` | `/api/refreshGenre/:genreId` | Admin | Refresh genre data |
+| `POST` | `/api/addGenre` | Admin | Create genre |
+| `POST` | `/api/editGenre` | Admin | Update genre |
+| `POST` | `/api/deleteGenre` | Admin | Delete genre (with password auth) |
+| `GET` | `/api/getFilmsAdmin` | Admin | Admin film listing |
+| `GET` | `/api/getFilmTranslations/:id` | Admin | Fetch all translations for a film |
+| `GET` | `/api/getFilmGenres/:id` | Admin | Fetch assigned genres for a film |
+| `GET` | `/api/getAllGenresList` | Admin | Fetch all available genres |
+| `POST` | `/api/addFilm` | Admin | Create film with poster upload (multipart/form-data) |
+| `PUT` | `/api/updateFilm/:id` | Admin | Update film metadata, translations, genres, and poster |
+| `POST` | `/api/deleteFilm` | Admin | Delete film (with password auth) |
+| `GET` | `/api/admin/dashboard/overview` | Admin | Dashboard overview (total films, users, activity logs) |
 | `GET` | `/api/admin/dashboard/films-analytics` | Admin | Film analytics (top films, ratings, genre distribution) |
 | `GET` | `/api/admin/dashboard/users-analytics` | Admin | User analytics (registration trends, moderation stats) |
 | `GET` | `/api/admin/dashboard/audit-logs` | Admin | Paginated audit logs of user actions |
@@ -329,7 +368,7 @@ The following features are actively planned and represent the next evolutionary 
 - [x] **Genre Association Engine** — Visual interface in film editor for attaching/detaching multiple genres with live search, immediate persistence via `film_genres` junction table, and `ON DELETE CASCADE` integrity.
 
 ### 📊 Analytics & Dashboards (`/admin/dashboard`)
-- [x] **Dashboard Overview** — Three-panel KPI dashboard displaying total films count, total users count, and active users count with visual distinction and real-time data fetching.
+- [x] **Dashboard Overview** — Three-panel KPI dashboard displaying total films count, total users count, and total activity logs count with visual distinction and real-time data fetching.
 - [x] **Film Analytics Panel** — Comprehensive film analytics featuring:
     - Top 10 most popular films (horizontal bar chart comparing likes vs. watched counts)
     - Average film rating gauge (circular progress indicator with min/max range)
@@ -338,7 +377,7 @@ The following features are actively planned and represent the next evolutionary 
 - [x] **User Analytics Panel** — User behavior analytics with:
     - 7-day registration trend (line chart showing new signups over time)
     - Moderation statistics (banned users count, suspended users count with status indicators)
-- [x] **Audit Logs Viewer** — Paginated activity stream (50 records/page) tracking user actions on films (like/unlike/watched/unwatched) with username, action type, film title, and timestamp. Includes filter by action type and real-time refresh capability.
+- [x] **Audit Logs Viewer** — Paginated activity stream (10 records/page, configurable) tracking user actions on films (like/unlike/watched/unwatched) with username, action type, film title, and timestamp. Includes filter by action type and username, and real-time refresh capability.
 - [x] **Interactive Data Visualization** — Responsive, theme-aware charts built with Recharts that adapt to the application's dark mode design system with custom tooltips and legends.
 - [ ] **Extended Time-Range Filtering** — Add date range picker for historical analysis beyond 7-day window.
 - [ ] **Export Functionality** — CSV/PDF export for analytics reports and audit logs.
@@ -369,41 +408,60 @@ The following features are actively planned and represent the next evolutionary 
 
 ### Prerequisites
 - [Node.js](https://nodejs.org/) (LTS recommended)
-- Running instance of [Movies-Backend](https://github.com/Dziopino/Movies-Backend)
+- [MySQL](https://www.mysql.com/) 8.0+
+- [Resend](https://resend.com/) API key (free tier: 100 emails/day, 3000/month) with verified domain
+- Git
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone https://github.com/Dziopino/Movies-Frontend.git
-cd Movies-Frontend
+git clone https://github.com/Dziopino/Movies.git
+cd movies
 
-# Install dependencies
+# Install backend dependencies
+cd backend
 npm install
 
-# Configure API endpoint
+# Configure backend environment
+cp .env.example .env
+# Edit .env with your database credentials, JWT secret, Resend API key, etc.
+
+# Start backend server
+npm run dev
+
+# In a new terminal - install frontend dependencies
+cd ../frontend
+npm install
+
+# Configure frontend API endpoint
 # Edit src/config/api.js:
 # export default { apiUrl: "http://localhost:8000" };
 
-# Start development server
+# Start frontend development server
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`.
+The application will be available at:
+- **Frontend**: `http://localhost:5173`
+- **Backend API**: `http://localhost:8000`
 
 ### Build for Production
 
 ```bash
+# Build frontend
+cd frontend
 npm run build
-```
+# Static output in dist/
 
-Static output is generated in the `dist/` directory.
+# Backend runs with: npm start
+```
 
 ---
 
 ## 🔐 Environment Variables
 
-The frontend relies on the backend's environment configuration. Ensure the backend `.env` is properly set:
+### Backend (`backend/.env`)
 
 ```env
 PORT=8000
@@ -418,14 +476,22 @@ DB_PORT=3306
 
 # Security
 JWT_SECRET=your_64_byte_hex_secret
+JWT_EXPIRES_IN=7d
 
-# Email (Gmail SMTP)
-MAIL_USER=your_email@gmail.com
-MAIL_PASSWORD=your_app_password
+# Email (Resend API)
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
 
-# CORS
+# CORS & Frontend
 FRONTEND_URL=http://localhost:5173
 CORS_ORIGIN=http://localhost:5173
+```
+
+### Frontend (`frontend/src/config/api.js`)
+
+```javascript
+export default {
+  apiUrl: "http://localhost:8000"
+};
 ```
 
 ---
@@ -433,26 +499,36 @@ CORS_ORIGIN=http://localhost:5173
 ## 📸 Screenshots
 
 <table>
-  <!-- Wiersz 1: Rejestracja i Języki -->
+
   <tr>
     <td width="33%"><b>1. Register Screen (with Password Validator)</b></td>
     <td width="33%"><b>2. Home Page (EN)</b></td>
     <td width="33%"><b>3. Home Page (PL)</b></td>
   </tr>
   <tr>
-    <td><img src="docs/register.png" width="100%"></td>
-    <td><img src="docs/home-en.png" width="100%"></td>
-    <td><img src="docs/home-pl.png" width="100%"></td>
+    <td><img src="docs/register.jpg" width="100%"></td>
+    <td><img src="docs/home-en.jpg" width="100%"></td>
+    <td><img src="docs/home-pl.jpg" width="100%"></td>
   </tr>
 
-  <!-- Wiersz 2: Panel Admina i Mobile -->
   <tr>
     <td colspan="2"><b>4. Admin Panel (User Management)</b></td>
     <td><b>5. Mobile View (RWD)</b></td>
   </tr>
   <tr>
-    <td colspan="2"><img src="docs/admin-users-desktop.png" width="100%"></td>
-    <td align="center"><img src="docs/admin-users-mobile.png" width="70%"></td>
+    <td colspan="2"><img src="docs/admin-users-desktop.jpg" width="100%"></td>
+    <td align="center"><img src="docs/admin-users-mobile.jpg" width="70%"></td>
+  </tr>
+
+  <tr>
+    <td width="33%"><b>6. User Account Dashboard</b></td>
+    <td width="33%"><b>7. Film Details (Cinematic View)</b></td>
+    <td width="33%"><b>8. Admin Analytics Dashboard</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/account.jpg" width="100%"></td>
+    <td><img src="docs/film.jpg" width="100%"></td>
+    <td><img src="docs/admin_dashboard.jpg" width="100%"></td>
   </tr>
 </table>
 

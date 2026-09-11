@@ -6,22 +6,19 @@ import useWarningContext from "../hooks/useWarningContext.js";
 import config from "../config/api.js";
 
 function Account() {
-
-    const {userData,setUserData} = useAuth();
-
+    const {userData, setUserData} = useAuth();
     const {showWarningPopup} = useWarningContext();
-
     const [languageCodes, setLanguageCodes] = useState([]);
     const [isBioEditionActive, setIsBioEditionActive] = useState(false);
     const [bioEditionInput, setBioEditionInput] = useState(userData.bio ?? "");
     const [isUserNameEditionActive, setIsUserNameEditionActive] = useState(false);
     const [userNameInput, setUserNameInput] = useState(userData.username);
     const [isProfilePictureEditionActive, setIsProfilePictureEditionActive] = useState(false);
-
+    const [stats, setStats] = useState({favorites: 0, watched: 0, totalFilms: 0});
+    const [auditLogs, setAuditLogs] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
     const fileInputRef = useRef(null);
-
     const { t } = useTranslation();
-
 
     const getUserData = useCallback(() => {
         fetch(`${config.apiUrl}/api/getUserData`,{
@@ -33,7 +30,6 @@ function Account() {
         })
             .then(res => res.json())
             .then(data => {
-
                 setUserData({
                     id: userData.id,
                     email: data.body.email,
@@ -44,33 +40,89 @@ function Account() {
                     bio: data.body.bio,
                     language_code: data.body.language_code
                 });
-
+                setTimeout(() => setIsLoaded(true), 100);
             })
-    },[setUserData, userData.id])
+            .catch(err => console.error("Error fetching user data:", err));
+    }, [setUserData, userData.id]);
 
     const getLanguageCodes = () => {
         fetch(`${config.apiUrl}/api/getLanguageCodes`)
-            .then(res => res.json()).then(data => {
-            setLanguageCodes(data.body);
+            .then(res => res.json())
+            .then(data => {
+                setLanguageCodes(data.body || []);
+            })
+            .catch(err => console.error("Error fetching languages:", err));
+    };
+
+    const getUserStats = useCallback(() => {
+        Promise.all([
+            fetch(`${config.apiUrl}/api/likedGet`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({page: 1, search: ""})
+            }).then(res => res.json()),
+            fetch(`${config.apiUrl}/api/watchedGet`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({page: 1, search: ""})
+            }).then(res => res.json()),
+            fetch(`${config.apiUrl}/api/getFilms`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({language: userData.language_code, page: 1, search: ""})
+            }).then(res => res.json())
+        ])
+            .then(([favData, watchedData, filmsData]) => {
+                setStats({
+                    favorites: favData.body?.length || 0,
+                    watched: watchedData.body?.length || 0,
+                    totalFilms: filmsData.totalPages ? filmsData.totalPages * 20 : 0
+                });
+            })
+            .catch(err => console.error("Error fetching stats:", err));
+    }, [userData.language_code]);
+
+    const getAuditLogs = useCallback(() => {
+        fetch(`${config.apiUrl}/api/getUserActivity`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
         })
-    }
+            .then(res => res.json())
+            .then(data => {
+                setAuditLogs(data.body || []);
+            })
+            .catch(err => console.error("Error fetching user activity:", err));
+    }, []);
 
     const onEditUserBio = (e) => {
         e.preventDefault();
-
         fetch(`${config.apiUrl}/api/editUserBio`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json" ,
+                "Content-Type": "application/json",
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({userBio: bioEditionInput}),
-        }).then(res => res.json()).then(() => {
-            setIsBioEditionActive(false);
-            getUserData();
         })
-
-    }
+            .then(res => res.json())
+            .then(() => {
+                setIsBioEditionActive(false);
+                getUserData();
+            })
+            .catch(err => console.error("Error updating bio:", err));
+    };
 
     const onEditUserName = (e) => {
         e.preventDefault();
@@ -81,15 +133,17 @@ function Account() {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({userName: userNameInput}),
-        }).then(res => res.json()).then(() => {
-            setIsUserNameEditionActive(false);
-            getUserData();
         })
-    }
+            .then(res => res.json())
+            .then(() => {
+                setIsUserNameEditionActive(false);
+                getUserData();
+            })
+            .catch(err => console.error("Error updating username:", err));
+    };
 
     const onChangeLanguage = (e) => {
         const selectedLanguageCode = e.target.value;
-
         fetch(`${config.apiUrl}/api/changeUserLanguage`, {
             method: "POST",
             headers: {
@@ -97,30 +151,26 @@ function Account() {
                 "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({userLanguageCode: selectedLanguageCode}),
-        }).then(res => res.json()).then(() => {
-
-            i18n.changeLanguage(selectedLanguageCode);
-
-            getUserData();
-
-            localStorage.setItem("language_code", selectedLanguageCode);
-        });
+        })
+            .then(res => res.json())
+            .then(() => {
+                i18n.changeLanguage(selectedLanguageCode);
+                getUserData();
+                getAuditLogs();
+                localStorage.setItem("language_code", selectedLanguageCode);
+            })
+            .catch(err => console.error("Error changing language:", err));
     };
 
     const onSetEditProfilePictureToggler = () => {
-        if(!isProfilePictureEditionActive){
-            setIsProfilePictureEditionActive(true);
-        }else{
-            setIsProfilePictureEditionActive(false);
-        }
-    }
+        setIsProfilePictureEditionActive(!isProfilePictureEditionActive);
+    };
 
     const onViewProfilePicture = () => {
         if (!userData.avatar_url){
             window.open(`${config.apiUrl}/uploads/posters/guest.webp`, "_blank");
             return;
         }
-
         window.open(`${config.apiUrl}${userData.avatar_url}`, "_blank");
     };
 
@@ -159,112 +209,241 @@ function Account() {
                     alert(data.message);
                     return;
                 }
-
                 getUserData();
+                getAuditLogs();
                 setIsProfilePictureEditionActive(false);
-            });
+            })
+            .catch(err => console.error("Error uploading avatar:", err));
     };
 
     useEffect(() => {
         if (userData.id === null) return;
-
         const blocked = showWarningPopup();
         if (blocked) return;
 
         getUserData();
         getLanguageCodes();
-    }, [getUserData, showWarningPopup, userData.id]);
+        getUserStats();
+        getAuditLogs();
+    }, [getUserData, showWarningPopup, userData.id, getUserStats, getAuditLogs]);
 
+    const activityMeta = {
+        USER_LOGGED_IN: {labelKey: "activity_login", descKey: "activity_login_desc"},
+        AVATAR_UPDATED: {labelKey: "activity_avatar_updated", descKey: "activity_avatar_updated_desc"},
+        FILM_LIKED: {labelKey: "activity_favorite_added", descKey: "activity_favorite_added_desc"},
+        FILM_WATCHED: {labelKey: "activity_watched_marked", descKey: "activity_watched_marked_desc"},
+        LANGUAGE_CHANGED: {labelKey: "activity_language_changed", descKey: "activity_language_changed_desc"}
+    };
 
+    const getActionIcon = (action) => {
+        const iconMap = {
+            USER_LOGGED_IN: "🔐",
+            AVATAR_UPDATED: "✏️",
+            FILM_LIKED: "♥️",
+            FILM_WATCHED: "👁️",
+            LANGUAGE_CHANGED: "🌐"
+        };
+        return iconMap[action] || "📝";
+    };
+
+    const getActionColor = (action) => {
+        const colorMap = {
+            USER_LOGGED_IN: "action-badge-success",
+            AVATAR_UPDATED: "action-badge-info",
+            FILM_LIKED: "action-badge-danger",
+            FILM_WATCHED: "action-badge-purple",
+            LANGUAGE_CHANGED: "action-badge-warning"
+        };
+        return colorMap[action] || "action-badge-default";
+    };
 
     return (
-        <div className="container py-5 text-white d-flex justify-content-center">
-            <div className="row align-items-center justify-content-center w-100" style={{ maxWidth: "1000px" }}>
-
-                <div className="col-md-4 mb-4 mb-md-0 d-flex justify-content-center">
-                    <div className="bg-dark rounded shadow-lg overflow-hidden w-100 text-center p-3">
-
-                        <img src={userData.avatar_url === null ? `${config.apiUrl}/uploads/posters/guest.webp` : `${config.apiUrl}${userData.avatar_url}`} alt="user avatar" className="img-fluid rounded-circle" style={{ width: "180px", height: "180px", objectFit: "cover", cursor: "pointer" }} onClick={onSetEditProfilePictureToggler}/>
+        <div className="account-dashboard-container">
+            <div className={`account-dashboard-grid ${isLoaded ? 'loaded' : ''}`}>
+                <div className="dashboard-header-card animate-slide-down">
+                    <div className="profile-header-section">
+                        <div className="avatar-wrapper-modern">
+                            <div className="avatar-glow"></div>
+                            <img src={userData.avatar_url === null ? `${config.apiUrl}/uploads/posters/guest.webp` : `${config.apiUrl}${userData.avatar_url}`} alt={t("profile_picture")} className="avatar-image-modern" onClick={onSetEditProfilePictureToggler}/>
+                            <div className="avatar-edit-indicator" onClick={onSetEditProfilePictureToggler}>
+                                <span>✏️</span>
+                            </div>
+                        </div>
 
                         {isProfilePictureEditionActive && (
-                            <div className="d-flex flex-column gap-2 mt-3">
-                                <button className="btn btn-outline-light" onClick={onViewProfilePicture}>{t("view_profile_picture")}</button>
-
-                                <button className="btn btn-outline-light" onClick={onOpenFilePicker}>{t("choose_a_profile_picture")}</button>
+                            <div className="avatar-options-popup animate-fade-in">
+                                <button className="avatar-option-btn" onClick={onViewProfilePicture}>
+                                    <span className="option-icon">👁️</span>
+                                    {t("view_profile_picture")}
+                                </button>
+                                <button className="avatar-option-btn" onClick={onOpenFilePicker}>
+                                    <span className="option-icon">📁</span>
+                                    {t("choose_a_profile_picture")}
+                                </button>
                             </div>
                         )}
-
                         <input type="file" ref={fileInputRef} style={{ display: "none" }} accept="image/*" onChange={onFileChange} />
 
-                    </div>
-                </div>
-
-                <div className="col-md-7 d-flex justify-content-center">
-                    <div className="bg-dark p-4 rounded shadow-lg w-100">
-
-                        <div className="mb-3">
+                        <div className="profile-info-section">
                             {isUserNameEditionActive ? (
-                                <form onSubmit={onEditUserName}>
-                                    <label className="form-label">{t("enter_your_new_username")}</label>
-
-                                    <input className="form-control" value={userNameInput}
-                                           onChange={(e) => setUserNameInput(e.target.value)}/>
-
-                                    <div className="mt-2 d-flex gap-2">
-                                        <button type="submit" className="btn btn-success">{t("confirm")}</button>
+                                <form onSubmit={onEditUserName} className="inline-edit-form animate-fade-in">
+                                    <input id="edit_username" className="inline-edit-input" value={userNameInput} onChange={(e) => setUserNameInput(e.target.value)} autoFocus/>
+                                    <div className="inline-edit-actions">
+                                        <button type="submit" className="inline-btn save-btn">✓</button>
+                                        <button type="button" className="inline-btn cancel-btn" onClick={() => setIsUserNameEditionActive(false)}>✕</button>
                                     </div>
                                 </form>
                             ) : (
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <h2 className="m-0">{t("username")}: {userData.username}</h2>
-                                    <img src="/edit.svg" alt="edit" style={{width: "24px", cursor: "pointer"}}
-                                         onClick={() => {
-                                             setUserNameInput(userData.username ?? "");
-                                             setIsUserNameEditionActive(true);
-                                         }}/>
+                                <div className="username-display">
+                                    <h1 className="username-title">{userData.username}</h1>
+                                    <button className="edit-icon-btn" onClick={() => {setUserNameInput(userData.username ?? "");setIsUserNameEditionActive(true);}}>
+                                        ✏️
+                                    </button>
                                 </div>
                             )}
+
+                            <p className="user-email">{userData.email}</p>
+
+                            <div className="user-role-badge">
+                                <span className="role-icon">{userData.role === 1 ? '👑' : '👤'}</span>
+                                <span className="role-text">{userData.role === 1 ? t("admin") : t("user")}</span>
+                            </div>
                         </div>
+                    </div>
+                </div>
 
-                        <p className="text-white mb-3">{t("email")}: {userData.email}</p>
+                <div className="dashboard-stats-row">
+                    <div className="stat-card-modern animate-scale-in" style={{animationDelay: '0.1s'}}>
+                        <div className="stat-icon-wrapper stat-favorites">
+                            <span className="stat-emoji">♥️</span>
+                        </div>
+                        <div className="stat-details">
+                            <div className="stat-number">{stats.favorites}</div>
+                            <div className="stat-label">{t("favorites") || "Favorites"}</div>
+                        </div>
+                        <div className="stat-sparkle"></div>
+                    </div>
 
-                        <div className="mb-3">
-                            {!userData.bio || isBioEditionActive ? (
-                                <form onSubmit={onEditUserBio}>
-                                    <label className="form-label">{t("enter_your_bio")}</label>
+                    <div className="stat-card-modern animate-scale-in" style={{animationDelay: '0.2s'}}>
+                        <div className="stat-icon-wrapper stat-watched">
+                            <span className="stat-emoji">👁️</span>
+                        </div>
+                        <div className="stat-details">
+                            <div className="stat-number">{stats.watched}</div>
+                            <div className="stat-label">{t("watched") || "Watched"}</div>
+                        </div>
+                        <div className="stat-sparkle"></div>
+                    </div>
+                </div>
 
-                                    <textarea className="form-control" rows="3" value={bioEditionInput}
-                                              onChange={(e) => setBioEditionInput(e.target.value)}/>
-
-                                    <button type="submit" className="btn btn-success mt-2">{t("confirm")}</button>
-                                </form>
-                            ) : (
-                                <div className="d-flex justify-content-between">
-                                    <p className="text-white">{t("bio")}: {userData.bio}</p>
-                                    <img src="/edit.svg" alt="edit" style={{width: "24px", cursor: "pointer"}}
-                                         onClick={() => {
-                                             setBioEditionInput(userData.bio ?? "");
-                                             setIsBioEditionActive(true)
-                                         }}/>
+                <div className="dashboard-bio-card animate-fade-in" style={{animationDelay: '0.4s'}}>
+                    <div className="card-header-modern">
+                        <h3 className="card-title-modern">
+                            <span className="title-icon">📝</span>
+                            {t("bio") || "About Me"}
+                        </h3>
+                    </div>
+                    <div className="card-content-modern">
+                        {!userData.bio || isBioEditionActive ? (
+                            <form onSubmit={onEditUserBio} className="bio-edit-form">
+                                <textarea id="edit_bio" className="bio-textarea-modern" rows="4" value={bioEditionInput} onChange={(e) => setBioEditionInput(e.target.value)} placeholder={t("enter_your_bio") || "Tell us about yourself..."}/>
+                                <div className="form-actions-modern">
+                                    <button type="submit" className="form-btn save-btn-modern">
+                                        <span>✓</span> {t("confirm")}
+                                    </button>
+                                    {userData.bio && (
+                                        <button type="button" className="form-btn cancel-btn-modern" onClick={() => setIsBioEditionActive(false)}>
+                                            <span>✕</span> {t("cancel")}
+                                        </button>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            </form>
+                        ) : (
+                            <div className="bio-display" onClick={() => {
+                                setBioEditionInput(userData.bio ?? "");
+                                setIsBioEditionActive(true);
+                            }}>
+                                <p className="bio-text">{userData.bio}</p>
+                                <div className="bio-edit-overlay">
+                                    <span className="edit-hint">{t("click_to_edit")}</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
 
-
-
-                        <div className="mt-4">
-                            <label className="text-white" htmlFor="language-select">{t("choose_your_language")}</label>
-
-                            <select id="language-select" className="form-select" value={userData.language_code || ""} onChange={onChangeLanguage}>
+                <div className="dashboard-settings-card animate-fade-in" style={{animationDelay: '0.5s'}}>
+                    <div className="card-header-modern">
+                        <h3 className="card-title-modern">
+                            <span className="title-icon">⚙️</span>
+                            {t("settings") || "Settings"}
+                        </h3>
+                    </div>
+                    <div className="card-content-modern">
+                        <div className="setting-item-modern">
+                            <label htmlFor="change_language" className="setting-label">
+                                <span className="label-icon">🌐</span>
+                                {t("choose_your_language") || "Language"}
+                            </label>
+                            <select id="change_language" className="setting-select-modern" value={userData.language_code || ""} onChange={onChangeLanguage}>
                                 {languageCodes?.map((language) => (
                                     <option key={language.code} value={language.code}>{language.name}</option>
                                 ))}
                             </select>
                         </div>
 
+                        <div className="setting-item-modern">
+                            <div className="setting-label">
+                                <span className="label-icon">📅</span>
+                                {t("member_since") || "Member Since"}
+                            </div>
+                            <div className="setting-value">
+                                {userData.created_at ? new Date(userData.created_at).toLocaleDateString(userData.language_code, {day: 'numeric', month: 'long', year: 'numeric'}) : "—"}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <div className="dashboard-activity-card animate-fade-in" style={{animationDelay: '0.6s'}}>
+                    <div className="card-header-modern">
+                        <h3 className="card-title-modern">
+                            <span className="title-icon">📊</span>
+                            {t("activity_log") || "Recent Activity"}
+                        </h3>
+                    </div>
+                    <div className="card-content-modern">
+                        <div className="activity-list">
+                            {auditLogs.length === 0 && (
+                                <p className="activity-description">{t("no_activity_yet")}</p>
+                            )}
+                            {auditLogs.map((log, index) => {
+                                const meta = activityMeta[log.action];
+                                if (!meta) return null;
+                                return (
+                                <div key={log.action} className="activity-item animate-slide-left" style={{animationDelay: `${index * 0.1}s`}}>
+                                    <div className="activity-icon-wrapper">
+                                        <span className="activity-emoji">{getActionIcon(log.action)}</span>
+                                    </div>
+                                    <div className="activity-details">
+                                        <div className="activity-header">
+                                            <span className={`activity-badge ${getActionColor(log.action)}`}>
+                                                {t(meta.labelKey)}
+                                            </span>
+                                            <span className="activity-time">
+                                                {new Date(log.created_at).toLocaleTimeString(userData.language_code, {
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}
+                                            </span>
+                                        </div>
+                                        <p className="activity-description">{t(meta.descKey)}</p>
+                                    </div>
+                                </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     );

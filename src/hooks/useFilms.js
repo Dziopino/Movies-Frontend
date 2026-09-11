@@ -8,7 +8,7 @@ function useFilms() {
 
     const {userData} = useContext(AuthContext);
 
-    const likeToggle = useCallback((filmId, reloadFilms) => {
+    const likeToggle = useCallback(async (filmId, callback) => {
 
         if (!userData.id) {
             alert("You can't like on guest account!");
@@ -20,14 +20,20 @@ function useFilms() {
             return;
         }
 
-
-        likeFilm(filmId, userData.id)
-            .then(() => reloadFilms());
+        try {
+            const response = await likeFilm(filmId, userData.id);
+            if (callback) {
+                callback(response);
+            }
+            return response;
+        } catch (err) {
+            console.error("Error toggling like:", err);
+        }
     }, [userData.id]);
 
 
 
-    const watchedToggle = useCallback((filmId, reloadFilms) => {
+    const watchedToggle = useCallback(async (filmId, callback) => {
 
         if (!userData.id) {
             alert("You can't watch on guest account!");
@@ -39,9 +45,15 @@ function useFilms() {
             return;
         }
 
-
-        watchFilm(filmId, userData.id)
-            .then(() => reloadFilms());
+        try {
+            const response = await watchFilm(filmId, userData.id);
+            if (callback) {
+                callback(response);
+            }
+            return response;
+        } catch (err) {
+            console.error("Error toggling watched:", err);
+        }
     }, [userData.id]);
 
 
