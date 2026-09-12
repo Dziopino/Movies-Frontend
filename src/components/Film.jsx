@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import Stars from "./Stars.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl } from "../config/api.js";
 
 function Film() {
     const { id } = useParams();
@@ -67,13 +67,13 @@ function Film() {
 
     return (
         <div className="film-hero-container">
-            <div className="film-backdrop-gradient" style={{backgroundImage: `url(${config.apiUrl}${film.poster_url})`}}></div>
+            <div className="film-backdrop-gradient" style={{backgroundImage: `url(${resolveImageUrl(film.poster_url)})`}}></div>
 
             <div className={`film-content-wrapper ${isLoaded ? 'loaded' : ''}`}>
                 <div className="film-split-layout">
                     <div className="film-poster-section animate-slide-left">
                         <div className="film-poster-frame">
-                            <img src={`${config.apiUrl}${film.poster_url}`} alt={film.title} className="film-poster-hero"/>
+                            <img src={resolveImageUrl(film.poster_url)} alt={film.title} className="film-poster-hero"/>
                             <div className="poster-glow"></div>
                         </div>
 

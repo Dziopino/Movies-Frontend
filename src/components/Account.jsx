@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import i18n from "i18next";
 import useAuth from "../hooks/useAuth.js";
 import useWarningContext from "../hooks/useWarningContext.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl, DEFAULT_AVATAR_URL } from "../config/api.js";
 
 function Account() {
     const {userData, setUserData} = useAuth();
@@ -168,10 +168,10 @@ function Account() {
 
     const onViewProfilePicture = () => {
         if (!userData.avatar_url){
-            window.open(`${config.apiUrl}/uploads/posters/guest.webp`, "_blank");
+            window.open(DEFAULT_AVATAR_URL, "_blank");
             return;
         }
-        window.open(`${config.apiUrl}${userData.avatar_url}`, "_blank");
+        window.open(resolveImageUrl(userData.avatar_url), "_blank");
     };
 
     const onOpenFilePicker = () => {
@@ -264,7 +264,7 @@ function Account() {
                     <div className="profile-header-section">
                         <div className="avatar-wrapper-modern">
                             <div className="avatar-glow"></div>
-                            <img src={userData.avatar_url === null ? `${config.apiUrl}/uploads/posters/guest.webp` : `${config.apiUrl}${userData.avatar_url}`} alt={t("profile_picture")} className="avatar-image-modern" onClick={onSetEditProfilePictureToggler}/>
+                            <img src={userData.avatar_url === null ? DEFAULT_AVATAR_URL : resolveImageUrl(userData.avatar_url)} alt={t("profile_picture")} className="avatar-image-modern" onClick={onSetEditProfilePictureToggler}/>
                             <div className="avatar-edit-indicator" onClick={onSetEditProfilePictureToggler}>
                                 <span>✏️</span>
                             </div>

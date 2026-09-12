@@ -4,7 +4,7 @@ import {useNavigate} from "react-router-dom";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl } from "../config/api.js";
 import Pagination from "./Pagination.jsx";
 import useDebounce from "../hooks/useDebounce.js";
 
@@ -44,7 +44,8 @@ function Favorites() {
             },
             body: JSON.stringify({
                 page: currentPage,
-                search: debouncedSearch
+                search: debouncedSearch,
+                ...(selectedGenre && { genreName: selectedGenre })
             })
         })
             .then(res => res.json())
@@ -73,7 +74,7 @@ function Favorites() {
                 setFavorites([]);
                 setIsLoading(false);
             });
-    }, [currentPage, debouncedSearch]);
+    }, [currentPage, debouncedSearch, selectedGenre]);
 
     const handleLikeToggle = async (filmId) => {
         await likeToggle(filmId);
@@ -96,7 +97,7 @@ function Favorites() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, selectedGenre]);
 
     useEffect(() => {
         const blocked = showWarningPopup();
@@ -104,16 +105,10 @@ function Favorites() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             reloadFilms();
         }
-    }, [userData.id, currentPage, debouncedSearch, reloadFilms, showWarningPopup]);
+    }, [userData.id, currentPage, debouncedSearch, reloadFilms, showWarningPopup, selectedGenre]);
 
     useEffect(() => {
         let filtered = [...favorites];
-
-        if (selectedGenre) {
-            filtered = filtered.filter(film =>
-                film.genres?.toLowerCase().includes(selectedGenre.toLowerCase())
-            );
-        }
 
         switch (sortBy) {
             case "rating":
@@ -133,7 +128,7 @@ function Favorites() {
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setFilteredFavorites(filtered);
-    }, [favorites, selectedGenre, sortBy]);
+    }, [favorites, sortBy]);
 
     return (
         <div className="favorites-ultra-container">
@@ -204,7 +199,7 @@ function Favorites() {
                             <div className="film-card-ultra animate-scale-in" key={favorite.id} style={{animationDelay: `${index * 0.05}s`}}>
                                 <div className="film-card-inner">
                                     <div className="film-poster-container" onClick={() => navigate(`/film/${favorite.id}`)}>
-                                        <img loading="lazy" src={`${config.apiUrl}${favorite.poster_url}`} className="film-poster-modern" alt={favorite.title}/>
+                                        <img loading="lazy" src={resolveImageUrl(favorite.poster_url)} className="film-poster-modern" alt={favorite.title}/>
                                         <div className="poster-overlay">
                                             <div className="overlay-content">
                                                 <span className="play-icon">▶</span>

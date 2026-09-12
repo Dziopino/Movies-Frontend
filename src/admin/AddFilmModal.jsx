@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Trash2, Plus, Upload, X } from "lucide-react";
 import { apiRequest } from "../services/apiService.js";
+import { addGenre } from "../services/adminService.js";
 
 function AddFilmModal({ isOpen, onClose, onConfirm }) {
     const { t } = useTranslation();
@@ -13,6 +14,19 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
     const [selectedGenres, setSelectedGenres] = useState([]);
     const [genreSearchTerms, setGenreSearchTerms] = useState([]);
     const [allGenres, setAllGenres] = useState([]);
+    const [addGenreModalOpen, setAddGenreModalOpen] = useState(false);
+    const [newGenreName, setNewGenreName] = useState("");
+
+    const loadGenres = useCallback(async () => {
+        try {
+            const data = await apiRequest("getGenres?page=1&limit=1000");
+            if (data.success && data.genres) {
+                setAllGenres(data.genres);
+            }
+        } catch (err) {
+            console.error("Error loading genres:", err);
+        }
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -23,14 +37,10 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
                     }
                 }).catch(err => console.error("Error loading languages:", err));
 
-            apiRequest("getGenres?page=1&limit=1000")
-                .then(data => {
-                    if (data.success && data.genres) {
-                        setAllGenres(data.genres);
-                    }
-                }).catch(err => console.error("Error loading genres:", err));
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            loadGenres();
         }
-    }, [isOpen]);
+    }, [isOpen, loadGenres]);
 
     if (!isOpen) {
         return null;
@@ -149,7 +159,7 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
         return languages.filter(lang => !selectedLanguages.includes(lang.code));
     };
 
-    const addGenre = () => {
+    const handleAddGenreRow = () => {
         setSelectedGenres(prev => [...prev, null]);
         setGenreSearchTerms(prev => [...prev, ""]);
     };
@@ -213,6 +223,36 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
         }
 
         return true;
+    };
+
+    const handleAddGenre = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!newGenreName.trim()) return;
+
+        try {
+            const response = await addGenre({ newGenreName: newGenreName.trim() });
+            if (response.success) {
+                setNewGenreName("");
+                setAddGenreModalOpen(false);
+                await loadGenres();
+            } else {
+                alert(t(response.message) || "Failed to add genre");
+            }
+        } catch (err) {
+            console.error("Error adding genre:", err);
+            alert(t("something_went_wrong"));
+        }
+    };
+
+    const openAddGenreModal = () => {
+        setAddGenreModalOpen(true);
+        setNewGenreName("");
+    };
+
+    const closeAddGenreModal = () => {
+        setAddGenreModalOpen(false);
+        setNewGenreName("");
     };
 
     return (
@@ -336,8 +376,12 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
                     ))}
 
                     {selectedGenres.length < allGenres.length && (
-                        <button type="button" className="btn btn-outline-secondary btn-sm w-100" onClick={addGenre}><Plus size={16} className="me-1" />{t("add_genre")}</button>
+                        <button type="button" className="btn btn-outline-secondary btn-sm w-100 mb-2" onClick={handleAddGenreRow}><Plus size={16} className="me-1" />{t("add_genre")}</button>
                     )}
+
+                    <button type="button" className="btn btn-outline-secondary btn-sm w-100" onClick={openAddGenreModal}>
+                        <Plus size={16} className="me-1" />{t("add_new_genre_to_database") || "Add new genre to database"}
+                    </button>
                 </div>
 
                 <div className="d-flex justify-content-end gap-2 mt-4">
@@ -345,6 +389,35 @@ function AddFilmModal({ isOpen, onClose, onConfirm }) {
                     <button className="btn btn-success" type="submit" disabled={!isFormValid()}>{t("add")}</button>
                 </div>
             </form>
+
+            {addGenreModalOpen && (
+                <div className="admin-modal-overlay" style={{ zIndex: 1060, backgroundColor: "rgba(0,0,0,0.7)" }}>
+                    <div className="admin-modal" style={{ width: "400px" }}>
+                        <h4 className="text-light">{t("add_new_genre") || "Add New Genre"}</h4>
+                        <div className="mt-3">
+                            <label className="text-light fw-semibold small" htmlFor="new_genre_name">
+                                {t("genre_name")}
+                            </label>
+                            <input
+                                id="new_genre_name"
+                                type="text"
+                                className="form-control mt-1"
+                                placeholder={t("enter_genre_name")}
+                                value={newGenreName}
+                                onChange={(e) => setNewGenreName(e.target.value)}
+                            />
+                        </div>
+                        <div className="d-flex justify-content-end gap-2 mt-4">
+                            <button className="btn btn-secondary" type="button" onClick={closeAddGenreModal}>
+                                {t("cancel")}
+                            </button>
+                            <button className="btn btn-success" type="button" onClick={handleAddGenre} disabled={!newGenreName.trim()}>
+                                {t("add")}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

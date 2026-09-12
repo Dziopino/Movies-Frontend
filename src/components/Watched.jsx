@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl } from "../config/api.js";
 import useDebounce from "../hooks/useDebounce.js";
 import Pagination from "./Pagination.jsx";
 
@@ -45,7 +45,8 @@ function Watched() {
             },
             body: JSON.stringify({
                 page: currentPage,
-                search: debouncedSearch
+                search: debouncedSearch,
+                ...(selectedGenre && { genreName: selectedGenre })
             })
         })
             .then(res => res.json())
@@ -74,7 +75,7 @@ function Watched() {
                 setWatched([]);
                 setIsLoading(false);
             });
-    }, [currentPage, debouncedSearch]);
+    }, [currentPage, debouncedSearch, selectedGenre]);
 
     const handleLikeToggle = async (filmId) => {
         await likeToggle(filmId);
@@ -98,7 +99,7 @@ function Watched() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, selectedGenre]);
 
     useEffect(() => {
         const blocked = showWarningPopup();
@@ -106,16 +107,10 @@ function Watched() {
             // eslint-disable-next-line react-hooks/set-state-in-effect
             reloadFilms();
         }
-    }, [userData.id, currentPage, debouncedSearch, reloadFilms, showWarningPopup]);
+    }, [userData.id, currentPage, debouncedSearch, reloadFilms, showWarningPopup, selectedGenre]);
 
     useEffect(() => {
         let filtered = [...watched];
-
-        if (selectedGenre) {
-            filtered = filtered.filter(film =>
-                film.genres?.toLowerCase().includes(selectedGenre.toLowerCase())
-            );
-        }
 
         switch (sortBy) {
             case "rating":
@@ -135,7 +130,7 @@ function Watched() {
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setFilteredWatched(filtered);
-    }, [watched, selectedGenre, sortBy]);
+    }, [watched, sortBy]);
 
     return (
         <div className="watched-ultra-container">
@@ -206,7 +201,7 @@ function Watched() {
                             <div className="film-card-ultra animate-scale-in" key={film.id} style={{animationDelay: `${index * 0.05}s`}}>
                                 <div className="film-card-inner">
                                     <div className="film-poster-container" onClick={() => navigate(`/film/${film.id}`)}>
-                                        <img loading="lazy" src={`${config.apiUrl}${film.poster_url}`} className="film-poster-modern" alt={film.title}/>
+                                        <img loading="lazy" src={resolveImageUrl(film.poster_url)} className="film-poster-modern" alt={film.title}/>
                                         <div className="poster-overlay">
                                             <div className="overlay-content">
                                                 <span className="play-icon">▶</span>

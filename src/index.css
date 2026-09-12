@@ -732,6 +732,16 @@ code {
     color: #6b7280;
 }
 
+.modern-search-input:-webkit-autofill,
+.modern-search-input:-webkit-autofill:hover,
+.modern-search-input:-webkit-autofill:focus,
+.modern-search-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgb(15, 16, 21) inset ;
+    -webkit-text-fill-color: #f3f4f6 !important;
+    caret-color: #f3f4f6;
+    transition: background-color 5000s ease-in-out 0s;
+}
+
 .modern-select {
     cursor: pointer;
 }
@@ -752,6 +762,9 @@ code {
     position: relative;
     width: 80px;
     height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .films-grid-modern {
@@ -1209,6 +1222,8 @@ code {
 
 .profile-info-section {
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .username-display {
@@ -1216,6 +1231,7 @@ code {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
+    max-width: 100%;
 }
 
 .username-title {
@@ -1224,6 +1240,8 @@ code {
     color: #ffffff;
     margin: 0;
     line-height: 1;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .edit-icon-btn {
@@ -1273,6 +1291,9 @@ code {
     display: flex;
     align-items: center;
     gap: 1rem;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .inline-edit-input {
@@ -1285,11 +1306,14 @@ code {
     font-weight: 700;
     outline: none;
     flex: 1;
+    min-width: 0;
+    max-width: 100%;
 }
 
 .inline-edit-actions {
     display: flex;
     gap: 0.5rem;
+    flex-shrink: 0;
 }
 
 .inline-btn {
@@ -1806,6 +1830,15 @@ code {
     .profile-header-section {
         flex-direction: column;
         text-align: center;
+    }
+
+    .profile-info-section {
+        width: 100%;
+    }
+
+    .inline-edit-form {
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .username-display {

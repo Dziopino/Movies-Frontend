@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import useWarningContext from "../hooks/useWarningContext.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl } from "../config/api.js";
 import Pagination from "./Pagination.jsx";
 import useDebounce from "../hooks/useDebounce.js";
 
@@ -37,18 +37,13 @@ function Home() {
             body: JSON.stringify({
                 language: userData.language_code,
                 page: currentPage,
-                search: debouncedSearch.trim()
+                search: debouncedSearch.trim(),
+                ...(selectedGenre && { genreName: selectedGenre })
             })
         })
             .then(res => res.json())
             .then(data => {
                 let filteredFilms = data.body || [];
-
-                if (selectedGenre) {
-                    filteredFilms = filteredFilms.filter(film =>
-                        film.genres?.toLowerCase().includes(selectedGenre.toLowerCase())
-                    );
-                }
 
                 switch (sortBy) {
                     case "rating":
@@ -144,7 +139,7 @@ function Home() {
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(1);
-    }, [debouncedSearch]);
+    }, [debouncedSearch, selectedGenre]);
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -228,7 +223,7 @@ function Home() {
                             <div className="film-card-ultra animate-scale-in" key={film.id} style={{animationDelay: `${index * 0.05}s`}}>
                                 <div className="film-card-inner">
                                     <div className="film-poster-container" onClick={() => navigate(`/film/${film.id}`)}>
-                                        <img loading="lazy" src={`${config.apiUrl}${film.poster_url}`} className="film-poster-modern" alt={film.title}/>
+                                        <img loading="lazy" src={resolveImageUrl(film.poster_url)} className="film-poster-modern" alt={film.title}/>
                                         <div className="poster-overlay">
                                             <div className="overlay-content">
                                                 <span className="play-icon">▶</span>

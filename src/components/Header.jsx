@@ -1,5 +1,6 @@
 import {NavLink, useNavigate} from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Collapse } from "bootstrap";
 import BackButton from "./BackButton.jsx";
 import useAuth from "../hooks/useAuth.js";
 
@@ -7,6 +8,15 @@ function Header() {
     const { t } = useTranslation();
     const {userData, logout}=useAuth();
     const navigate = useNavigate();
+
+    const closeMobileNav = () => {
+        const navbarCollapse = document.getElementById("navbarNav");
+        if (navbarCollapse && navbarCollapse.classList.contains("show")) {
+            const bsCollapse = Collapse.getOrCreateInstance(navbarCollapse);
+            bsCollapse.hide();
+        }
+    };
+
     return (
         <header>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark p-4">
@@ -18,7 +28,7 @@ function Header() {
 
 
 
-                <div className="collapse navbar-collapse" id="navbarNav">
+                <div className="collapse navbar-collapse" id="navbarNav" onClick={closeMobileNav}>
 
 
                     <ul className="navbar-nav">

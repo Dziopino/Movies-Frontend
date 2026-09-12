@@ -144,6 +144,8 @@ const resources = {
             description:"Description",
             enter_description:"Enter description",
             add_translation:"Add translation",
+            add_new_genre:"Add New Genre",
+            add_new_genre_to_database:"Add new genre to database",
             genre:"Genre",
             select_genre:"Select genre",
             search_genre:"Search genre",

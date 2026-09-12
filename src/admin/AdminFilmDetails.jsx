@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Calendar, Clock, Star, Languages, Tag, Edit2, Save, X, Plus, Search } from "lucide-react";
 import useAuth from "../hooks/useAuth.js";
-import config from "../config/api.js";
+import config, { resolveImageUrl } from "../config/api.js";
 
 function AdminFilmDetails() {
     const { id } = useParams();
@@ -257,7 +257,7 @@ function AdminFilmDetails() {
             <div className="row">
                 <div className="col-lg-4 mb-4">
                     <div className="card bg-dark border-secondary">
-                        <img src={`${config.apiUrl}${film.poster_url}`} alt={film.title} className="card-img-top" style={{ height: "auto", objectFit: "cover" }}/>
+                        <img src={resolveImageUrl(film.poster_url)} alt={film.title} className="card-img-top" style={{ height: "auto", objectFit: "cover" }}/>
                         {isEditMode && (
                             <div className="card-body">
                                 <label htmlFor="poster-upload" className="form-label text-light small">{t('change_poster')}</label>
