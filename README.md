@@ -88,6 +88,7 @@ The platform serves two distinct user personas:
 | **JWT (jsonwebtoken)** | Stateless authentication |
 | **bcrypt** | Secure password hashing |
 | **multer + sharp** | Image upload pipeline with WebP compression (300×300 avatars, 200×285 posters, max 2MB) |
+| **Cloudinary** | Cloud image storage and delivery for avatars and film posters |
 | **Resend** | HTTPS-based transactional email API (password reset flow) |
 | **helmet** | HTTP security headers (CSP, HSTS, X-Frame-Options) |
 | **express-rate-limit** | Rate limiting (global: 750 req/15min, auth: 10 req/15min) |
@@ -134,7 +135,7 @@ The platform serves two distinct user personas:
 ## ✨ Key Features
 
 ### End-User Capabilities
-- **Dynamic Film Catalog** — Client-side rendered lists with localized titles and descriptions via `film_translations` relation.
+- **Dynamic Film Catalog** — Client-side rendered lists with localized titles and descriptions via `film_translations` relation. Server-side genre filtering with accurate pagination across Home, Favorites, and Watched views.
 - **Intelligent Search** — Debounced query input (500ms) reducing API request overhead; backend SQL `LIKE` filtering.
 - **Interactive Watchlists** — Toggle favorites and watched states with immediate UI feedback and persistent storage.
 - **Adaptive Theming** — CSS custom properties with automatic dark/light mode detection.
@@ -162,8 +163,8 @@ Implemented a layered security model using React Context (`AuthContext`) paired 
 ### 2. Role-Based Access Control (RBAC)
 The system distinguishes between public, authenticated, and admin-only routes. The `optionalAuthMiddleware` on the backend enables personalized experiences (e.g., showing favorite status) even for unauthenticated guests, without blocking access to public content.
 
-### 3. Server-Side Search & Pagination
-Search logic is fully delegated to the database layer using parameterized SQL `LIKE` queries combined with `LIMIT`/`OFFSET` pagination. This ensures consistent performance regardless of dataset size, avoiding frontend memory bottlenecks.
+### 3. Server-Side Search, Pagination & Genre Filtering
+Search and genre filtering are fully delegated to the database layer using parameterized SQL `LIKE` queries and `HAVING` + `FIND_IN_SET` for genre matching, combined with `LIMIT`/`OFFSET` pagination. This ensures consistent performance regardless of dataset size and accurate page counts when filters are active, avoiding frontend memory bottlenecks and pagination desync.
 
 ### 4. Debounced Input Handling
 A custom `useDebounce` hook encapsulates request throttling logic, reducing API call frequency during rapid user input. This pattern is reused across all search interfaces (films, users, genres) ensuring a performant and cost-effective frontend.
@@ -185,8 +186,8 @@ Administrative tables utilize Bootstrap's display utilities (`d-none d-lg-block`
 ### 8. Database Integrity
 Relies on foreign key constraints, unique composite indexes (e.g., `user_id` + `film_id` in favorites), and `ON DELETE CASCADE` on junction tables to maintain referential integrity without manual cleanup logic.
 
-### 9. Image Processing Pipeline
-Backend handles image uploads via `multer` + `sharp`: automatic WebP conversion, 300×300px (avatars) / 200×285px (posters) resize, 2MB size limit, with secure filename generation and MIME type validation. Old avatars are deleted on replacement.
+### 9. Image Processing & Cloud Storage Pipeline
+Backend handles image uploads via `multer` + `sharp`: automatic WebP conversion, 300×300px (avatars) / 200×285px (posters) resize, 2MB size limit, with MIME type validation. Compressed images are streamed directly to **Cloudinary** for cloud storage and CDN delivery. Old images are automatically deleted from Cloudinary on avatar replacement, poster update, or film deletion. The frontend resolves image URLs via a `resolveImageUrl()` helper that handles both Cloudinary HTTPS URLs and legacy local paths.
 
 ### 10. Rate Limiting & Security
 Express rate limiting middleware protects authentication endpoints against brute-force attacks (10 req/15min). Global limiter at 750 req/15min. Helmet.js provides HTTP security headers (CSP, HSTS, X-Frame-Options). CORS configuration restricts origins to the frontend domain.
@@ -259,7 +260,7 @@ Movies-Frontend/
 │   │   ├── Stars.jsx
 │   │   └── ScrollToTop.js
 │   ├── config/                 # API configuration
-│   │   └── api.js
+│   │   └── api.js              # API base URL, resolveImageUrl(), DEFAULT_AVATAR_URL
 │   ├── context/                # Global state containers
 │   │   ├── AuthContext.jsx
 │   │   ├── ErrorContext.jsx    # Rate limit error handling
@@ -309,13 +310,13 @@ The frontend communicates with the backend via a centralized service layer using
 | `POST` | `/api/requestPasswordReset` | — | Request password reset email |
 | `GET` | `/api/getResetToken/:token` | — | Verify reset token |
 | `POST` | `/api/resetPassword/:token` | — | Reset password with token |
-| `POST` | `/api/getFilms` | Optional | Paginated film catalog with search |
+| `POST` | `/api/getFilms` | Optional | Paginated film catalog with search and genre filter |
 | `GET` | `/api/getFilm/:id` | Optional | Film details with genres & user states |
 | `GET` | `/api/getLanguageCodes` | — | Get supported language codes |
 | `POST` | `/api/likeToggle` | JWT | Add/remove favorite |
 | `POST` | `/api/watchedToggle` | JWT | Toggle watched status |
-| `POST` | `/api/likedGet` | JWT | Paginated favorites list |
-| `POST` | `/api/watchedGet` | JWT | Paginated watched list |
+| `POST` | `/api/likedGet` | JWT | Paginated favorites list with genre filter |
+| `POST` | `/api/watchedGet` | JWT | Paginated watched list with genre filter |
 | `POST` | `/api/getUserData` | JWT | Get user profile data |
 | `POST` | `/api/getUserActivity` | JWT | Get user's activity history |
 | `POST` | `/api/editUserBio` | JWT | Update user biography |
@@ -481,6 +482,11 @@ JWT_EXPIRES_IN=7d
 # Email (Resend API)
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
 
+# Cloudinary (Image Storage)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
 # CORS & Frontend
 FRONTEND_URL=http://localhost:5173
 CORS_ORIGIN=http://localhost:5173
@@ -492,6 +498,8 @@ CORS_ORIGIN=http://localhost:5173
 export default {
   apiUrl: "http://localhost:8000"
 };
+// Also exports resolveImageUrl() helper for Cloudinary/local URL resolution
+// and DEFAULT_AVATAR_URL constant for fallback avatar
 ```
 
 ---
