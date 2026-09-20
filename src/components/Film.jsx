@@ -5,6 +5,7 @@ import Stars from "./Stars.jsx";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
 import config, { resolveImageUrl } from "../config/api.js";
+import CommentsSection from "./CommentsSection.jsx";
 
 function Film() {
     const { id } = useParams();
@@ -168,6 +169,10 @@ function Film() {
                                     </span>
                                 </div>
                             </div>
+                        </div>
+
+                        <div className="film-comments-section animate-fade-in" style={{animationDelay: '0.4s'}}>
+                            <CommentsSection filmId={film.id} />
                         </div>
                     </div>
                 </div>

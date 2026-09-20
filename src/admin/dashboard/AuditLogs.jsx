@@ -12,7 +12,7 @@ const AuditLogs = () => {
     const [pagination, setPagination] = useState({currentPage: 1, totalPages: 1, totalRows: 0});
     const [filters, setFilters] = useState({action: '', username: '', page: 1, limit: 10});
     const debouncedUsername = useDebounce(filters.username, 500);
-    const actionTypes = ['FILM_LIKED', 'FILM_UNLIKED', 'FILM_WATCHED', 'FILM_UNWATCHED', 'USER_REGISTERED', 'USER_LOGGED_IN', 'PROFILE_UPDATED', 'USERNAME_CHANGED', 'BIO_UPDATED', 'LANGUAGE_CHANGED', 'AVATAR_UPDATED', 'PASSWORD_CHANGED', 'PASSWORD_RESET_REQUESTED', 'PASSWORD_RESET_COMPLETED', 'USER_BANNED', 'USER_UNBANNED', 'USER_SUSPENDED', 'USER_UNSUSPENDED', 'USER_PROMOTED', 'GENRE_CREATED', 'GENRE_UPDATED', 'GENRE_DELETED', 'FILM_CREATED', 'FILM_UPDATED', 'FILM_DELETED'];
+    const actionTypes = ['FILM_LIKED', 'FILM_UNLIKED', 'FILM_WATCHED', 'FILM_UNWATCHED', 'USER_REGISTERED', 'USER_LOGGED_IN', 'PROFILE_UPDATED', 'USERNAME_CHANGED', 'BIO_UPDATED', 'LANGUAGE_CHANGED', 'AVATAR_UPDATED', 'PASSWORD_CHANGED', 'PASSWORD_RESET_REQUESTED', 'PASSWORD_RESET_COMPLETED', 'USER_BANNED', 'USER_UNBANNED', 'USER_SUSPENDED', 'USER_UNSUSPENDED', 'USER_PROMOTED', 'GENRE_CREATED', 'GENRE_UPDATED', 'GENRE_DELETED', 'FILM_CREATED', 'FILM_UPDATED', 'FILM_DELETED','COMMENT_ADDED','COMMENT_DELETED','COMMENT_CHANGED'];
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/immutability
@@ -67,6 +67,7 @@ const AuditLogs = () => {
             'USER_SUSPENDED': { bg: 'bg-danger bg-opacity-25', text: 'text-danger', icon: 'bi-pause-circle' },
             'FILM_DELETED': { bg: 'bg-danger bg-opacity-25', text: 'text-danger', icon: 'bi-trash' },
             'GENRE_DELETED': { bg: 'bg-danger bg-opacity-25', text: 'text-danger', icon: 'bi-trash' },
+            'COMMENT_DELETED': { bg: 'bg-danger bg-opacity-25', text: 'text-danger', icon: 'bi-trash' },
 
             'USER_UNBANNED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-shield-check' },
             'USER_UNSUSPENDED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-play-circle' },
@@ -75,6 +76,7 @@ const AuditLogs = () => {
             'PASSWORD_RESET_COMPLETED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-check-circle' },
             'FILM_CREATED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-plus-circle' },
             'GENRE_CREATED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-tag-fill' },
+            'COMMENT_ADDED': { bg: 'bg-success bg-opacity-25', text: 'text-success', icon: 'bi-tag-fill' },
 
             'USER_LOGGED_IN': { bg: 'bg-primary bg-opacity-25', text: 'text-primary', icon: 'bi-box-arrow-in-right' },
             'FILM_LIKED': { bg: 'bg-primary bg-opacity-25', text: 'text-primary', icon: 'bi-heart-fill' },
@@ -92,7 +94,8 @@ const AuditLogs = () => {
             'BIO_UPDATED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-card-text' },
             'LANGUAGE_CHANGED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-translate' },
             'AVATAR_UPDATED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-image' },
-            'PROFILE_UPDATED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-person-gear' }
+            'PROFILE_UPDATED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-person-gear' },
+            'COMMENT_CHANGED': { bg: 'bg-info bg-opacity-25', text: 'text-info', icon: 'bi-person-gear' }
         };
         return styles[action] || { bg: 'bg-secondary bg-opacity-25', text: 'text-secondary', icon: 'bi-question-circle' };
     };
