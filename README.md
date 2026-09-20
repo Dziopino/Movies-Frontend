@@ -5,7 +5,7 @@
 ### Full-Stack Movie Catalog & Management Platform
 
 Cinemix is a full-stack web application for browsing, searching and managing a movie catalog.
-Users can create accounts, manage favorites and watched movies, customize their profiles and use the application in multiple languages.
+Users can create accounts, manage favorites and watched movies, discuss each film in comment threads, customize their profiles and use the application in multiple languages.
 
 The platform also includes a protected administration panel for managing users, genres and movie data.
 
@@ -15,7 +15,7 @@ The platform also includes a protected administration panel for managing users, 
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?logo=mysql&logoColor=white)](https://www.mysql.com/)
 
-**React 19 · Vite · REST API · RBAC · i18n · Server-Side Pagination**
+**React 19 · Vite · REST API · RBAC · i18n · Server-Side Pagination · Infinite Scroll · AI Spoiler Moderation**
 
 [Frontend Repo](https://github.com/Dziopino/Movies-Frontend) · [Backend Repo](https://github.com/Dziopino/Movies-Backend) · [Live Demo](https://cinemix.xyz) · [Screenshots](#-screenshots)
 
@@ -46,7 +46,7 @@ The platform also includes a protected administration panel for managing users, 
 **Cinemix** is a fully functional, full-stack web application engineered for browsing, searching, and administrating a movie catalog. Built with a modular React 19 frontend and a robust Node.js/Express REST API, it demonstrates full-stack development patterns including **Role-Based Access Control (RBAC)**, **JWT authentication**, **server-side pagination**, **debounced search**, and **internationalization (i18n)**.
 
 The platform serves two distinct user personas:
-- **End Users** — browse films, manage personal watchlists, and interact with a localized UI.
+- **End Users** — browse films, manage personal watchlists, discuss films in AI-moderated comment threads, and interact with a localized UI.
 - **Administrators** — manage users (ban/suspend/promote), curate genres (CRUD), and oversee film inventory through a protected admin dashboard.
 
 > This repository contains the **Frontend** codebase. The backend API and database schema are maintained in a separate, linked repository.
@@ -57,7 +57,7 @@ The platform serves two distinct user personas:
 
 > **Current Phase:** Active Development (v0.8 Beta)
 >
-> The core platform is fully operational — users can register, authenticate, browse films, manage watchlists, and administrators can moderate users and genres. The application is currently being extended with advanced content management, real-time analytics, and audit logging capabilities.
+> The core platform is fully operational — users can register, authenticate, browse films, manage watchlists, post and moderate their own comments, and administrators can moderate users and genres. The application is currently being extended with advanced content management, real-time analytics, and audit logging capabilities.
 >
 > See the [Roadmap](#-roadmap) for upcoming features and architectural enhancements.
 
@@ -89,6 +89,7 @@ The platform serves two distinct user personas:
 | **bcrypt** | Secure password hashing |
 | **multer + sharp** | Image upload pipeline with WebP compression (300×300 avatars, 200×285 posters, max 2MB) |
 | **Cloudinary** | Cloud image storage and delivery for avatars and film posters |
+| **Google Gemini** | REST-based spoiler classification of comment content (`is_spoiler` flag), fail-open |
 | **Resend** | HTTPS-based transactional email API (password reset flow) |
 | **helmet** | HTTP security headers (CSP, HSTS, X-Frame-Options) |
 | **express-rate-limit** | Rate limiting (global: 750 req/15min, auth: 10 req/15min) |
@@ -138,6 +139,7 @@ The platform serves two distinct user personas:
 - **Dynamic Film Catalog** — Client-side rendered lists with localized titles and descriptions via `film_translations` relation. Server-side genre filtering with accurate pagination across Home, Favorites, and Watched views.
 - **Intelligent Search** — Debounced query input (500ms) reducing API request overhead; backend SQL `LIKE` filtering.
 - **Interactive Watchlists** — Toggle favorites and watched states with immediate UI feedback and persistent storage.
+- **Film Discussions** — Post, inline-edit and delete comments on any film. Comments flagged as spoilers by the backend are rendered blurred behind a click-to-reveal overlay, author-only controls appear as compact icon buttons, and the thread lazy-loads 20 entries at a time as the reader scrolls.
 - **Adaptive Theming** — CSS custom properties with automatic dark/light mode detection.
 - **Responsive Layout** — Dual-view architecture: data tables for desktop (`lg` breakpoint), card-based layouts for mobile.
 - **User Profiles** — Customizable biography, display name, avatar upload (300×300 WebP), and language preference (PL/EN).
@@ -198,6 +200,15 @@ Comprehensive `user_activity` table tracks all user actions (favorites, watched,
 ### 12. Localized Response Architecture
 The backend returns i18n **message keys** (e.g., `user_banned_successfully`, `database_error`) rather than hardcoded English strings. The React frontend translates these keys via `react-i18next`, enabling seamless multi-language support without backend redeployment.
 
+### 13. Comment Thread: Infinite Scroll & AI Spoiler Guard
+Comment rendering is split into `CommentsSection` (data, pagination, submission) and `Comment` (single card, inline edit, spoiler reveal).
+
+- **Infinite scroll over page buttons** — `fetchPage(n)` replaces the list on page 1 and appends on later pages. An `IntersectionObserver` watches a sentinel below the list with a `200px` root margin, so the next 20 comments arrive before the reader hits the end; a `useRef` guard prevents overlapping requests and `hasMore` is derived from `page < totalPages`, so threads with 20 or fewer comments render no sentinel at all.
+- **Total count independent of scroll depth** — the section header shows the server's `comments_count`, not the length of the loaded slice, so the number stays truthful while the list grows.
+- **Ownership-gated controls** — the API exposes `comment.user_id`; only the author sees the edit/delete affordances, presented as compact Lucide icon buttons whose meaning is carried by `title` and `aria-label`, identical on mobile and desktop.
+- **Spoiler reveal** — `is_spoiler === 1` renders the body blurred under a click-to-reveal overlay; the flag is re-read after every edit because the classifier re-runs server-side.
+- **Targeted state updates** — a successful edit or delete patches the local array in place rather than refetching the thread; only a new post refreshes page 1, where it appears at the top because the feed is ordered newest-first.
+
 ---
 
 ## 📁 Project Structure
@@ -236,6 +247,8 @@ Movies-Frontend/
 │   ├── components/             # Shared & user-facing components
 │   │   ├── Home.jsx
 │   │   ├── Film.jsx
+│   │   ├── CommentsSection.jsx # Thread container: pagination, submission
+│   │   ├── Comment.jsx         # Single card: spoiler reveal, inline edit, delete
 │   │   ├── Favorites.jsx
 │   │   ├── Watched.jsx
 │   │   ├── Login.jsx
@@ -323,6 +336,10 @@ The frontend communicates with the backend via a centralized service layer using
 | `POST` | `/api/editUserName` | JWT | Update display name |
 | `POST` | `/api/changeUserLanguage` | JWT | Update preferred locale |
 | `POST` | `/api/uploadAvatar` | JWT | Upload profile picture |
+| `GET` | `/api/films/:id/comments` | Optional | Paginated comment thread (20/page, `?page=N`) with author id, username and avatar |
+| `POST` | `/api/films/:id/comments` | JWT | Publish a comment; response returns the backend's `is_spoiler` verdict |
+| `PUT` | `/api/films/:id/comments/:commentId` | JWT (author) | Edit own comment; re-classifies the edited text for spoilers |
+| `DELETE` | `/api/films/:id/comments/:commentId` | JWT (author/admin) | Delete own comment; admins can moderate any comment |
 | `GET` | `/api/getUsers` | Admin | User management data |
 | `GET` | `/api/refreshUser/:userId` | Admin | Refresh user data |
 | `POST` | `/api/banUser` | Admin | Ban user account |
@@ -367,6 +384,12 @@ The following features are actively planned and represent the next evolutionary 
     - Atomic updates via backend transactions
 - [x] **Translation Manager** — Integrated into film details page: add, edit, or remove localized titles and descriptions per language code with duplicate language prevention and mandatory English translation.
 - [x] **Genre Association Engine** — Visual interface in film editor for attaching/detaching multiple genres with live search, immediate persistence via `film_genres` junction table, and `ON DELETE CASCADE` integrity.
+
+### 💬 Community & Discussion (Film Comments)
+- [x] **Comment Posting** — Authenticated comment form on the film detail view with a 5000-character counter, validation messages, and a success notice that also reports when the backend classified the new comment as a spoiler.
+- [x] **Author Controls** — Inline editing and deletion for the comment's own author, exposed as compact icon buttons with tooltips; deletion asks for confirmation and the row is removed from local state without refetching the thread.
+- [x] **Spoiler Protection** — Comments flagged server-side by Gemini render blurred behind a click-to-reveal overlay, so discussion stays usable for people who have not seen the film yet.
+- [x] **Infinite Scroll Retrieval** — Thread loads 20 comments initially and appends the next page automatically as the reader approaches the end, with a compact inline spinner and a localised empty state.
 
 ### 📊 Analytics & Dashboards (`/admin/dashboard`)
 - [x] **Dashboard Overview** — Three-panel KPI dashboard displaying total films count, total users count, and total activity logs count with visual distinction and real-time data fetching.
@@ -486,6 +509,9 @@ RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
+
+# Google Gemini (Comment Spoiler Detection)
+GEMINI_API_KEY=your_gemini_api_key
 
 # CORS & Frontend
 FRONTEND_URL=http://localhost:5173
