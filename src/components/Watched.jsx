@@ -54,16 +54,6 @@ function Watched() {
                 if (data.message === "Watched got successfully") {
                     setWatched(data.body || []);
                     setTotalPages(data.totalPages || 0);
-
-                    const allGenres = new Set();
-                    (data.body || []).forEach(film => {
-                        if (film.genres) {
-                            film.genres.split(",").forEach(genre => {
-                                allGenres.add(genre.trim());
-                            });
-                        }
-                    });
-                    setGenres(Array.from(allGenres).sort());
                 } else {
                     console.error(data.message);
                     setWatched([]);
@@ -76,6 +66,34 @@ function Watched() {
                 setIsLoading(false);
             });
     }, [currentPage, debouncedSearch, selectedGenre]);
+
+    // Options come from the unfiltered list so applying a filter cannot shrink the dropdown
+    const fetchGenres = useCallback(() => {
+        fetch(`${config.apiUrl}/api/watchedGet`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify({
+                page: 1,
+                search: ""
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                const allGenres = new Set();
+                (data.body || []).forEach(film => {
+                    if (film.genres) {
+                        film.genres.split(",").forEach(genre => {
+                            allGenres.add(genre.trim());
+                        });
+                    }
+                });
+                setGenres(Array.from(allGenres).sort());
+            })
+            .catch(err => console.error("Error fetching genres:", err));
+    }, []);
 
     const handleLikeToggle = async (filmId) => {
         await likeToggle(filmId);
@@ -108,6 +126,11 @@ function Watched() {
             reloadFilms();
         }
     }, [userData.id, currentPage, debouncedSearch, reloadFilms, showWarningPopup, selectedGenre]);
+
+    useEffect(() => {
+        if (!userData.id) return;
+        fetchGenres();
+    }, [fetchGenres, userData.id]);
 
     useEffect(() => {
         let filtered = [...watched];
