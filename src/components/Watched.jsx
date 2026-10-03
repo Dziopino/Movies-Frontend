@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
-import PageHeader from "./PageHeader.jsx";
 import {useTranslation} from "react-i18next";
 import useAuth from "../hooks/useAuth.js";
 import useFilmContext from "../hooks/useFilmContext.js";
@@ -67,7 +66,6 @@ function Watched() {
             });
     }, [currentPage, debouncedSearch, selectedGenre]);
 
-    // Options come from the unfiltered list so applying a filter cannot shrink the dropdown
     const fetchGenres = useCallback(() => {
         fetch(`${config.apiUrl}/api/watchedGet`, {
             method: "POST",
@@ -110,7 +108,6 @@ function Watched() {
 
     const handleWatchedToggle = async (filmId) => {
         await watchedToggle(filmId);
-        // Remove from watched list since it was unmarked as watched
         setWatched(prevWatched => prevWatched.filter(film => film.id !== filmId));
     };
 
@@ -179,7 +176,7 @@ function Watched() {
 
                         <div className="filter-group">
                             <div className="filter-icon">🎭</div>
-                            <select id="genres_filter" className="modern-select" value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
+                            <select id="genres_filter" className="modern-select" aria-label="filter_films_by_genre"  value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
                                 <option value="">{t("all_genres") || "All Genres"}</option>
                                 {genres.map((genre) => (
                                     <option key={genre} value={genre}>
@@ -191,7 +188,7 @@ function Watched() {
 
                         <div className="filter-group">
                             <div className="filter-icon">⚡</div>
-                            <select id="filter_by" className="modern-select" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+                            <select id="filter_by" className="modern-select" aria-label="sort_by" value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
                                 <option value="newest">{t("newest") || "Newest First"}</option>
                                 <option value="oldest">{t("oldest") || "Oldest First"}</option>
                                 <option value="rating">{t("highest_rated") || "Top Rated"}</option>

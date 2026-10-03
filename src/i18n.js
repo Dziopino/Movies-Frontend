@@ -335,7 +335,9 @@ const resources = {
             confirm_delete_comment: "Are you sure you want to delete this comment?",
             comment_updated_success: "Comment updated successfully!",
             comment_deleted_success: "Comment deleted successfully.",
-            spoiler_recheck: "Re-checking spoiler status..."
+            spoiler_recheck: "Re-checking spoiler status...",
+            filter_films_by_genre: "Filter films by genre",
+            sort_by:"Sort by",
         }
     },
     pl: {
@@ -670,7 +672,9 @@ const resources = {
             confirm_delete_comment: "Czy na pewno chcesz usunąć ten komentarz?",
             comment_updated_success: "Komentarz zaktualizowany pomyślnie!",
             comment_deleted_success: "Komentarz usunięty.",
-            spoiler_recheck: "Ponowna sprawdzanie statusu spoilera..."
+            spoiler_recheck: "Ponowna sprawdzanie statusu spoilera...",
+            filter_films_by_genre: "Przefiltruj filmy przez gatunki",
+            sort_by: "Sortuj na podstawie",
         }
     }
 };

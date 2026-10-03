@@ -3,3 +3,7 @@ Allow: /
 
 Disallow: /admin/
 Disallow: /api/
+Disallow: /favorites
+Disallow: /watched
+Disallow: /account
+Disallow: /forgotPassword
